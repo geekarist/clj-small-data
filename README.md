@@ -1,10 +1,29 @@
 # clj-small-data
 
-A Clojure library designed to ... well, that part is up to you.
+A desktop application that lets you search all your personal data that is stored in various "sources":
+
+- Personal notes in `.md` files (Obsidian)
+- Documents in the cloud (Google Drive, Dropbox)
+- Local documents
+- Web browser bookmarks
+- E-mails
+- As a fallback, a classical web search like Google Search or DuckDuckGo.
+
+## Install
+
+TODO
+
+## Features
+
+TODO
+
+## Planned
+
+TODO
 
 ## Usage
 
-FIXME
+TODO
 
 ## License
 
