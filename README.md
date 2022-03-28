@@ -7,7 +7,7 @@ A desktop application that lets you search all your personal data that is stored
 - Local documents
 - Web browser bookmarks
 - E-mails
-- As a fallback, a classical web search like Google Search or DuckDuckGo.
+- As a fallback, a classical search engine like Google Search or DuckDuckGo.
 
 ## Install
 
