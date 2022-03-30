@@ -2,19 +2,25 @@
   (:require [cljfx.api :as fx]))
 
 (def initial-state-map
-  {:title "Hello"
+  {:title "Hello again!"
    :search-field-placeholder "Please enter your search text"
    :results
-   [{:text "First result"}
-    {:text "Second result"}
-    {:text "Third result"}
-    {:text "Fourth result"}
-    {:text "Fifth result"}
-    {:text "Sixth result"}
-    {:text "Seventh result"}]})
+   [{:text "1st result"}
+    {:text "2nd result"}
+    {:text "3rd result"}
+    {:text "4th result"}
+    {:text "5th result"}
+    {:text "6th result"}
+    {:text "7th result"}]})
 
 (def state-atom
   (atom initial-state-map))
+
+(defn reload-state []
+  (swap!
+   state-atom
+   (fn [_state-val]
+     initial-state-map)))
 
 (defn root [{state-map :state}]
   {:fx/type :stage
@@ -26,15 +32,21 @@
    {:fx/type :scene
     :root
     {:fx/type :v-box
-     :alignment :top-left
+     :padding 16
+     :style {:-fx-background-color "#ffff00"}
      :children
      (cons
-      {:fx/type :text-field
-       :v-box/margin {:left 8 :right 8}
-       :text (state-map :search-field-placeholder)}
+      {:fx/type :h-box
+       :style {:-fx-background-color "#00ff00"}
+       :children
+       [{:fx/type :text-field
+         :style {:-fx-background-color "#ff0000"}
+         :prompt-text (state-map :search-field-placeholder)}
+        {:fx/type :button :text "Search"
+         :on-action (fn [_] (reload-state))}]}
       (map (fn [result-map]
              {:fx/type :label
-              :v-box/margin {:top 8 :left 8 :right 8}
+              :v-box/margin {:top 16}
               :text (result-map :text)})
            (state-map :results)))}}})
 
@@ -47,4 +59,4 @@
 (fx/mount-renderer state-atom renderer)
 
 (comment
-  (swap! state-atom (fn [_state-val] initial-state-map)))
+  (reload-state))
