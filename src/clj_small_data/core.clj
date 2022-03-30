@@ -41,12 +41,15 @@
        :children
        [{:fx/type :text-field
          :style {:-fx-background-color "#ff0000"}
+         :h-box/hgrow :always
+         :h-box/margin {:right 8}
          :prompt-text (state-map :search-field-placeholder)}
         {:fx/type :button :text "Search"
          :on-action (fn [_] (reload-state))}]}
       (map (fn [result-map]
              {:fx/type :label
               :v-box/margin {:top 16}
+              :style {:-fx-background-color "#0000ff"}
               :text (result-map :text)})
            (state-map :results)))}}})
 
