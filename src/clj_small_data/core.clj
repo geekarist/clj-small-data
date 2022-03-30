@@ -44,7 +44,8 @@
          :h-box/hgrow :always
          :h-box/margin {:right 8}
          :prompt-text (state-map :search-field-placeholder)}
-        {:fx/type :button :text "Search"
+        {:fx/type :button :text "Search" :h-box/margin {:right 8}}
+        {:fx/type :button :text "Reload"
          :on-action (fn [_] (reload-state))}]}
       (map (fn [result-map]
              {:fx/type :label
