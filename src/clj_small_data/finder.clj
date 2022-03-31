@@ -9,19 +9,33 @@
    [{:mdl/text "No result found."}]})
 
 (defn view [{state-map :state dispatch! :dispatch}]
+
+  ;; Window
   {:fx/type :stage :showing true :title (state-map :mdl/title)
    :width 600 :height 600
+
+   ;; Main container
    :scene
    {:fx/type :scene :root
+
+    ;; Vertical box
     {:fx/type :v-box :padding 16
+
+     ;; Vertical children
      :children
      (cons
+
+      ;; Query field and buttons
       {:fx/type :h-box
        :children
-       [{:fx/type :text-field
+
+       [;; Query
+        {:fx/type :text-field
          :h-box/hgrow :always :text (state-map :mdl/search-text)
          :prompt-text (state-map :mdl/search-field-placeholder)
          :on-text-changed #(dispatch! [:msg/change-search-query %])}
+
+        ;; Buttons
         {:fx/type :button :text "Clear"
          :on-action (fn [_] (dispatch! [:msg/clear]))}
         {:fx/type :button :text "Search" :h-box/margin {:left 8}}
@@ -29,6 +43,8 @@
          :on-action (fn [_] (dispatch! [:msg/redraw]))}
         {:fx/type :button :text "Log"
          :on-action (fn [_] (dispatch! [:msg/log]))}]}
+
+      ;; List of results
       (map (fn [result-map]
              {:fx/type :label :v-box/margin {:top 16}
               :text (result-map :mdl/text)})
