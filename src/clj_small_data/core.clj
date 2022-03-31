@@ -58,10 +58,13 @@
 (defn finder-update [state-hash msg-key msg-val]
   (condp = msg-key
     :change-search-query
-    (assoc state-hash :search-text msg-val)))
+    (let [new-state-hash (assoc state-hash :search-text msg-val)
+          new-effect-vec nil]
+      [new-state-hash new-effect-vec])))
 
 (defn dispatch! [[msg-key msg-val :as _message-vec]]
-  (let [new-state-hash (finder-update @state-atom msg-key msg-val)
+  (let [update-result-vec (finder-update @state-atom msg-key msg-val)
+        [new-state-hash _new-effect-vec] update-result-vec
         get-new-state-hash (fn [_current-state-hash] new-state-hash)]
     (swap! state-atom get-new-state-hash)))
 
