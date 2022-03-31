@@ -13,12 +13,12 @@
    :width 600 :height 600
    :scene
    {:fx/type :scene :root
-    {:fx/type :v-box :padding 16 :style {:-fx-background-color "#ffff00"}
+    {:fx/type :v-box :padding 16
      :children
      (cons
-      {:fx/type :h-box :style {:-fx-background-color "#00ff00"}
+      {:fx/type :h-box
        :children
-       [{:fx/type :text-field :style {:-fx-background-color "#ff0000"}
+       [{:fx/type :text-field
          :h-box/hgrow :always :text (state-map :mdl/search-text)
          :prompt-text (state-map :mdl/search-field-placeholder)
          :on-text-changed #(dispatch! [:msg/change-search-query %])}
@@ -31,7 +31,6 @@
          :on-action (fn [_] (dispatch! [:msg/log]))}]}
       (map (fn [result-map]
              {:fx/type :label :v-box/margin {:top 16}
-              :style {:-fx-background-color "#0000ff"}
               :text (result-map :mdl/text)})
            (state-map :mdl/results)))}}})
 
