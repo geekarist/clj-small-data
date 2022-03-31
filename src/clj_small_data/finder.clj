@@ -1,4 +1,5 @@
-(ns clj-small-data.finder)
+(ns clj-small-data.finder
+  (:refer-clojure :exclude [update]))
 
 (def init
   {:title "Hello again!"
