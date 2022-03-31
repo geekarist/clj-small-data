@@ -1,5 +1,6 @@
 (ns clj-small-data.finder
-  (:refer-clojure :exclude [update]))
+  (:refer-clojure :exclude [update])
+  (:require [clojure.java.shell :only [sh]]))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -38,7 +39,8 @@
         ;; Buttons
         {:fx/type :button :text "Clear"
          :on-action (fn [_] (dispatch! [:msg/clear]))}
-        {:fx/type :button :text "Search" :h-box/margin {:left 8}}
+        {:fx/type :button :text "Search" :h-box/margin {:left 8}
+         :on-action (fn [_] (dispatch! [:msg/search]))}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
          :on-action (fn [_] (dispatch! [:msg/redraw]))}
         {:fx/type :button :text "Log"
@@ -69,14 +71,30 @@
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
+    :msg/search
+    (let [new-state-hash state-hash
+          new-effect-vec
+          [:fx/search (state-hash :mdl/search-text)]]
+      [new-state-hash new-effect-vec])
+
     :msg/log
     (let [new-state-hash state-hash
           new-effect-vec [:fx/log state-hash]]
       [new-state-hash new-effect-vec])))
 
+(defn- search-file! [value]
+  (println
+   (sh "rg" value "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB/")))
+
 (defn effect! [[key value :as _new-effect-vec] _dispatch!]
+
   (condp = key
+
+    :fx/search (search-file! value)
+
     :fx/log (println "State:" value)
+
     nil nil ; Ignore `nil` effect
+
     (println "Effect not found:" key)))
 
