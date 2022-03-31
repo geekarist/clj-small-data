@@ -16,7 +16,7 @@
 (def state-atom
   (atom finder-init))
 
-(defn reload-state! []
+(defn- reload-state! []
   (swap!
    state-atom
    (fn [_state-val]
@@ -44,10 +44,10 @@
          :h-box/hgrow :always
          :h-box/margin {:right 8}
          :prompt-text (state-map :search-field-placeholder)
-         :on-text-changed #(dispatch! [:change-search-query %])}
+         :on-text-changed #(dispatch! [:msg/change-search-query %])}
         {:fx/type :button :text "Search" :h-box/margin {:right 8}}
         {:fx/type :button :text "Reload"
-         :on-action (fn [_] (reload-state!))}]}
+         :on-action (fn [_] (dispatch! [:msg/reload-initial-state]))}]}
       (map (fn [result-map]
              {:fx/type :label
               :v-box/margin {:top 16}
@@ -57,16 +57,26 @@
 
 (defn finder-update [state-hash msg-key msg-val]
   (condp = msg-key
-    :change-search-query
+    :msg/change-search-query
     (let [new-state-hash (assoc state-hash :search-text msg-val)
           new-effect-vec nil]
+      [new-state-hash new-effect-vec])
+    :msg/reload-initial-state
+    (let [new-state-hash state-hash
+          new-effect-vec [:fx/reload-initial-state]]
       [new-state-hash new-effect-vec])))
 
-(defn dispatch! [[msg-key msg-val :as _message-vec]]
+(defn finder-effect! [[key _value :as _new-effect-vec] _dispatch!]
+  (condp = key
+    :fx/reload-initial-state
+    (reload-state!)))
+
+(defn- dispatch! [[msg-key msg-val :as _message-vec]]
   (let [update-result-vec (finder-update @state-atom msg-key msg-val)
-        [new-state-hash _new-effect-vec] update-result-vec
+        [new-state-hash new-effect-vec] update-result-vec
         get-new-state-hash (fn [_current-state-hash] new-state-hash)]
-    (swap! state-atom get-new-state-hash)))
+    (swap! state-atom get-new-state-hash)
+    (finder-effect! new-effect-vec dispatch!)))
 
 (def renderer
   (fx/create-renderer
@@ -74,7 +84,9 @@
                 (fn [state-val]
                   {:fx/type finder-view :state state-val :dispatch dispatch!}))))
 
-(fx/mount-renderer state-atom renderer)
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defonce _mounted-renderer
+  (fx/mount-renderer state-atom renderer))
 
 (comment
   (println @state-atom)
