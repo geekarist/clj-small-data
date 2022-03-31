@@ -36,9 +36,9 @@
          :h-box/margin {:right 8}
          :prompt-text (state-map :search-field-placeholder)
          :on-text-changed #(dispatch! [:msg/change-search-query %])}
-        {:fx/type :button :text "Search" :h-box/margin {:right 8}}
-        {:fx/type :button :text "Reload"
-         :on-action (fn [_] (dispatch! [:msg/reload-initial-state]))}]}
+        {:fx/type :button :text "Search"}
+        {:fx/type :button :text "Reload" :h-box/margin {:left 8}
+         :on-action (fn [_] (dispatch! [:msg/reload-state]))}]}
       (map (fn [result-map]
              {:fx/type :label
               :v-box/margin {:top 16}
@@ -52,8 +52,8 @@
     (let [new-state-hash (assoc state-hash :search-text msg-val)
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
-    :msg/reload-initial-state
-    (let [new-state-hash init
+    :msg/reload-state
+    (let [new-state-hash state-hash
           new-effect-vec nil]
       [new-state-hash new-effect-vec])))
 
