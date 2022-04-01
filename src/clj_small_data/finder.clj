@@ -51,7 +51,9 @@
       ;; List of results
       (map (fn [result-map]
              {:fx/type :label :v-box/margin {:top 16}
-              :style {:-fx-background-color "#ff0000"}
+              :padding 16
+              :style {:-fx-border-color "#aaaaaa"
+                      :-fx-border-width 1}
               :text (result-map :mdl/text)})
            (state-map :mdl/results)))}}})
 
@@ -100,8 +102,7 @@
         [state-hash nil])))
 
 ;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
-;; (def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
-(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles")
+(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
 
 (defn- search-file! [query dispatch!]
   (future
