@@ -50,12 +50,14 @@
       ;; List of results
       (map (fn [result-map]
              {:fx/type :label :v-box/margin {:top 16}
+              :style {:-fx-background-color "#ff0000"}
               :text (result-map :mdl/text)})
            (state-map :mdl/results)))}}})
 
 (defn- update-on-receive-search-output [state-hash search-output]
   (let [split-output (str/split search-output #"\n")
-        str->result (fn [element] {:mdl/text element})
+        clean-str (fn [string] (str/replace string #"\n*$" ""))
+        str->result (fn [string] {:mdl/text (clean-str string)})
         results (map str->result split-output)]
     (assoc state-hash :mdl/results results)))
 
