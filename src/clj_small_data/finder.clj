@@ -1,6 +1,7 @@
 (ns clj-small-data.finder
   (:refer-clojure :exclude [update])
-  (:require [clojure.java.shell :as shell]
+  (:require [cljfx.api :as fx]
+            [clojure.java.shell :as shell]
             [clojure.string :as str]))
 
 (def init
@@ -56,8 +57,7 @@
 
 (defn- update-on-receive-search-output [state-hash search-output]
   (let [split-output (str/split search-output #"\n")
-        clean-str (fn [string] (str/replace string #"\n*$" ""))
-        str->result (fn [string] {:mdl/text (clean-str string)})
+        str->result (fn [string] {:mdl/text string})
         results (map str->result split-output)]
     (assoc state-hash :mdl/results results)))
 
@@ -100,13 +100,15 @@
         [state-hash nil])))
 
 ;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
-(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
+;; (def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
+(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles")
 
 (defn- search-file! [query dispatch!]
-  @(future
-     (let [result (shell/sh "rg" query SEARCH_DIR)
-           output (result :out)]
-       (dispatch! [:msg/receive-search-output output]))))
+  (future
+    (let [result (shell/sh "rg" query SEARCH_DIR)
+          output (result :out)]
+      (fx/on-fx-thread
+       (dispatch! [:msg/receive-search-output output])))))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
