@@ -23,8 +23,6 @@
 
     ;; Vertical box
     {:fx/type :v-box :padding 16
-
-     ;; Vertical children
      :children
      (cons
 
@@ -70,12 +68,12 @@
         results (map str->result split-output-vec)]
     (assoc state-hash :mdl/results results)))
 
-(defn update [state-hash msg-key msg-val]
+(defn update [state-hash event-key event-val]
 
-  (condp = msg-key
+  (condp = event-key
 
     :evt/change-search-query
-    (let [new-state-hash (assoc state-hash :mdl/search-text msg-val)
+    (let [new-state-hash (assoc state-hash :mdl/search-text event-val)
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
@@ -97,7 +95,7 @@
 
     :evt/receive-search-output
     (let [new-state-hash
-          (update-on-receive-search-output state-hash msg-val)]
+          (update-on-receive-search-output state-hash event-val)]
       [new-state-hash nil])
 
     :evt/log-btn-pressed
@@ -105,7 +103,7 @@
           new-effect-vec [:eff/log state-hash]]
       [new-state-hash new-effect-vec])
 
-    (do (println "Unknown message key:" msg-key)
+    (do (println "Unknown message key:" event-key)
         [state-hash nil])))
 
 ;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
