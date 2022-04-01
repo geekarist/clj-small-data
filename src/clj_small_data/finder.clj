@@ -9,7 +9,7 @@
    :mdl/search-text ""
    :mdl/search-field-placeholder "Please enter your search text"
    :mdl/results
-   [{:mdl/text "No result found."}]})
+   []})
 
 (defn view [{state-map :state dispatch! :dispatch}]
 
@@ -54,13 +54,20 @@
               :padding 16
               :style {:-fx-border-color "#aaaaaa"
                       :-fx-border-width 1}
-              :text (result-map :mdl/text)})
+              :text (str (result-map :mdl/file) "\n" (result-map :mdl/match))})
            (state-map :mdl/results)))}}})
 
-(defn- update-on-receive-search-output [state-hash search-output]
-  (let [split-output (str/split search-output #"\n")
-        str->result (fn [string] {:mdl/text string})
-        results (map str->result split-output)]
+(defn- str->result [string]
+  (let [split-by-colon-vec (str/split string #":")
+        [_disk-str path-str match-str] split-by-colon-vec
+        split-path-by-slash (str/split path-str #"/")
+        short-path-str (last split-path-by-slash)]
+    {:mdl/file short-path-str
+     :mdl/match match-str}))
+
+(defn- update-on-receive-search-output [state-hash search-output-str]
+  (let [split-output-vec (str/split search-output-str #"\n")
+        results (map str->result split-output-vec)]
     (assoc state-hash :mdl/results results)))
 
 (defn update [state-hash msg-key msg-val]
