@@ -1,6 +1,7 @@
 (ns clj-small-data.finder
   (:refer-clojure :exclude [update])
-  (:require [clojure.java.shell :as shell]))
+  (:require [clojure.java.shell :as shell]
+            [clojure.string :as str]))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -52,6 +53,12 @@
               :text (result-map :mdl/text)})
            (state-map :mdl/results)))}}})
 
+(defn- update-on-receive-search-output [state-hash search-output]
+  (let [split-output (str/split search-output #"\n")
+        str->result (fn [element] {:mdl/text element})
+        results (map str->result split-output)]
+    (assoc state-hash :mdl/results results)))
+
 (defn update [state-hash msg-key msg-val]
 
   (condp = msg-key
@@ -77,20 +84,31 @@
           [:fx/search (state-hash :mdl/search-text)]]
       [new-state-hash new-effect-vec])
 
+    :msg/receive-search-output
+    (let [new-state-hash
+          (update-on-receive-search-output state-hash msg-val)]
+      [new-state-hash nil])
+
     :msg/log
     (let [new-state-hash state-hash
           new-effect-vec [:fx/log state-hash]]
-      [new-state-hash new-effect-vec])))
+      [new-state-hash new-effect-vec])
 
-(defn- search-file! [value]
-  (println
-   (shell/sh
-    "rg"
-    value "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")))
+    (do (println "Unknown message key:" msg-key)
+        [state-hash nil])))
 
-(defn effect! [[key value :as _new-effect-vec] _dispatch!]
+;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
+(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
+
+(defn- search-file! [query dispatch!]
+  @(future
+     (let [result (shell/sh "rg" query SEARCH_DIR)
+           output (result :out)]
+       (dispatch! [:msg/receive-search-output output]))))
+
+(defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
-    :fx/search (search-file! value)
+    :fx/search (search-file! value dispatch!)
     :fx/log (println "State:" value)
     nil nil ; Ignore `nil` effect
     (println "Effect not found:" key)))
