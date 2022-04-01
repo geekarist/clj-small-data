@@ -36,17 +36,17 @@
         {:fx/type :text-field
          :h-box/hgrow :always :text (state-map :mdl/search-text)
          :prompt-text (state-map :mdl/search-field-placeholder)
-         :on-text-changed #(dispatch! [:msg/change-search-query %])}
+         :on-text-changed #(dispatch! [:evt/change-search-query %])}
 
         ;; Buttons
         {:fx/type :button :text "Clear"
-         :on-action (fn [_] (dispatch! [:msg/clear]))}
+         :on-action (fn [_] (dispatch! [:evt/clear]))}
         {:fx/type :button :text "Search" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:msg/search]))}
+         :on-action (fn [_] (dispatch! [:evt/search]))}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:msg/redraw]))}
+         :on-action (fn [_] (dispatch! [:evt/redraw]))}
         {:fx/type :button :text "Log"
-         :on-action (fn [_] (dispatch! [:msg/log]))}]}
+         :on-action (fn [_] (dispatch! [:evt/log]))}]}
 
       ;; List of results
       (map (fn [result-map]
@@ -74,35 +74,35 @@
 
   (condp = msg-key
 
-    :msg/change-search-query
+    :evt/change-search-query
     (let [new-state-hash (assoc state-hash :mdl/search-text msg-val)
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :msg/redraw
+    :evt/redraw
     (let [new-state-hash state-hash
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :msg/clear
+    :evt/clear
     (let [new-state-hash init
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :msg/search
+    :evt/search
     (let [new-state-hash state-hash
           new-effect-vec
-          [:fx/search (state-hash :mdl/search-text)]]
+          [:eff/search (state-hash :mdl/search-text)]]
       [new-state-hash new-effect-vec])
 
-    :msg/receive-search-output
+    :evt/receive-search-output
     (let [new-state-hash
           (update-on-receive-search-output state-hash msg-val)]
       [new-state-hash nil])
 
-    :msg/log
+    :evt/log
     (let [new-state-hash state-hash
-          new-effect-vec [:fx/log state-hash]]
+          new-effect-vec [:eff/log state-hash]]
       [new-state-hash new-effect-vec])
 
     (do (println "Unknown message key:" msg-key)
@@ -116,12 +116,12 @@
     (let [result (shell/sh "rg" query SEARCH_DIR)
           output (result :out)]
       (fx/on-fx-thread
-       (dispatch! [:msg/receive-search-output output])))))
+       (dispatch! [:evt/receive-search-output output])))))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
-    :fx/search (search-file! value dispatch!)
-    :fx/log (println "State:" value)
+    :eff/search (search-file! value dispatch!)
+    :eff/log (println "State:" value)
     nil nil ; Ignore `nil` effect
     (println "Effect not found:" key)))
 
