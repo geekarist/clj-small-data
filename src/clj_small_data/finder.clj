@@ -1,6 +1,6 @@
 (ns clj-small-data.finder
   (:refer-clojure :exclude [update])
-  (:require [clojure.java.shell :only [sh]]))
+  (:require [clojure.java.shell :as shell]))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -84,17 +84,14 @@
 
 (defn- search-file! [value]
   (println
-   (sh "rg" value "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB/")))
+   (shell/sh
+    "rg"
+    value "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")))
 
 (defn effect! [[key value :as _new-effect-vec] _dispatch!]
-
   (condp = key
-
     :fx/search (search-file! value)
-
     :fx/log (println "State:" value)
-
     nil nil ; Ignore `nil` effect
-
     (println "Effect not found:" key)))
 
