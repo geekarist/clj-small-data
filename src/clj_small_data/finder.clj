@@ -40,13 +40,13 @@
 
         ;; Buttons
         {:fx/type :button :text "Clear"
-         :on-action (fn [_] (dispatch! [:evt/clear]))}
+         :on-action (fn [_] (dispatch! [:evt/clear-btn-pressed]))}
         {:fx/type :button :text "Search" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:evt/search]))}
+         :on-action (fn [_] (dispatch! [:evt/search-btn-pressed]))}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:evt/redraw]))}
+         :on-action (fn [_] (dispatch! [:evt/redraw-btn-pressed]))}
         {:fx/type :button :text "Log"
-         :on-action (fn [_] (dispatch! [:evt/log]))}]}
+         :on-action (fn [_] (dispatch! [:evt/log-btn-pressed]))}]}
 
       ;; List of results
       (map (fn [result-map]
@@ -79,17 +79,17 @@
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :evt/redraw
+    :evt/redraw-btn-pressed
     (let [new-state-hash state-hash
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :evt/clear
+    :evt/clear-btn-pressed
     (let [new-state-hash init
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
-    :evt/search
+    :evt/search-btn-pressed
     (let [new-state-hash state-hash
           new-effect-vec
           [:eff/search (state-hash :mdl/search-text)]]
@@ -100,7 +100,7 @@
           (update-on-receive-search-output state-hash msg-val)]
       [new-state-hash nil])
 
-    :evt/log
+    :evt/log-btn-pressed
     (let [new-state-hash state-hash
           new-effect-vec [:eff/log state-hash]]
       [new-state-hash new-effect-vec])
