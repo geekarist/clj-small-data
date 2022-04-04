@@ -55,16 +55,27 @@
               :text (str (result-map :mdl/file) "\n" (result-map :mdl/match))})
            (state-map :mdl/results)))}}})
 
-(defn- str->result [string]
-  (let [split-by-colon-vec (str/split string #":")
-        [_disk-str path-str match-str] split-by-colon-vec
-        split-path-by-slash (str/split path-str #"/")
-        short-path-str (last split-path-by-slash)]
-    {:mdl/file short-path-str
-     :mdl/match match-str}))
+(defn- wrap-long-lines
+  "Take `string` and insert line endings every `width` characters.
+   - Start at `opt-index` (0 if not defined)
+   - Accumulate result into `opt-acc`"
+  [string width & [opt-index opt-acc]]
+  (let [index (if opt-index opt-index 0)
+        acc (if opt-acc opt-acc "")]
+    (if (= index (.length string)) acc
+        (if (and (not (= 0 index))
+                 (= 0 (mod index width)))
+          (wrap-long-lines
+           string width (+ index 1) (str acc (nth string index) "\n"))
+          (wrap-long-lines
+           string width (+ index 1) (str acc (nth string index)))))))
 
-(defn- update-on-receive-search-output [state-hash search-output-str]
-  (let [split-output-vec (str/split search-output-str #"\n")
+(defn- str->result [string]
+  {:mdl/file "TODO"
+   :mdl/match (wrap-long-lines string 80)})
+
+(defn- update-on-search-output-received [state-hash search-output-json-str]
+  (let [split-output-vec (str/split search-output-json-str #"\n")
         results (map str->result split-output-vec)]
     (assoc state-hash :mdl/results results)))
 
@@ -93,9 +104,9 @@
           [:eff/search (state-hash :mdl/search-text)]]
       [new-state-hash new-effect-vec])
 
-    :evt/receive-search-output
+    :evt/search-output-received
     (let [new-state-hash
-          (update-on-receive-search-output state-hash event-val)]
+          (update-on-search-output-received state-hash event-val)]
       [new-state-hash nil])
 
     :evt/log-btn-pressed
@@ -106,15 +117,18 @@
     (do (println "Unknown message key:" event-key)
         [state-hash nil])))
 
-;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
-(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
+(def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
+;; (def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
 
 (defn- search-file! [query dispatch!]
   (future
-    (let [result (shell/sh "rg" query SEARCH_DIR)
+    (let [result (shell/sh "rg" "--json" query SEARCH_DIR)
           output (result :out)]
       (fx/on-fx-thread
-       (dispatch! [:evt/receive-search-output output])))))
+       (dispatch! [:evt/search-output-received output])))))
+
+(comment
+  (search-file! "hello" #(println (nth % 1))))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
