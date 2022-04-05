@@ -22,12 +22,13 @@
    {:fx/type :scene :root
 
     ;; Vertical box
-    {:fx/type :v-box :padding 16
+    {:fx/type :v-box
      :children
-     (cons
+     (vector
 
       ;; Query field and buttons
       {:fx/type :h-box
+       :padding 16
        :children
 
        [;; Query
@@ -46,18 +47,24 @@
         {:fx/type :button :text "Log"
          :on-action (fn [_] (dispatch! [:evt/log-btn-pressed]))}]}
 
-      ;; List of results
-      (map (fn [result-map]
-             {:fx/type :h-box
-              :v-box/margin {:top 16}
-              :style {:-fx-border-color "#aaaaaa"
-                      :-fx-border-width 1}
-              :children
-              [{:fx/type :label
-                :padding 16
+       ;; List of results
+      {:fx/type :scroll-pane
+       :content
 
-                :text (str (result-map :mdl/file) "\n" (result-map :mdl/match))}]})
-           (state-map :mdl/results)))}}})
+       {:fx/type :v-box
+        :children
+        (map (fn [result-map]
+               {:fx/type :h-box
+                :v-box/margin {:left 16
+                               :right 16
+                               :bottom 16}
+                :style {:-fx-border-color "#aaaaaa"
+                        :-fx-border-width 1}
+                :children
+                [{:fx/type :label
+                  :padding 16
+                  :text (str (result-map :mdl/file) "\n" (result-map :mdl/match))}]})
+             (state-map :mdl/results))}})}}})
 
 (defn- wrap-long-lines
   "Take `string` and insert line endings every `width` characters."
@@ -129,8 +136,8 @@
     (do (println "Unknown message key:" event-key)
         [state-hash nil])))
 
-(def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
-;; (def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
+;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
+(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
 
 (defn- search-file! [query dispatch!]
   (future
