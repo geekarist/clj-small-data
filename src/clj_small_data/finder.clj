@@ -54,7 +54,7 @@
        {:fx/type :v-box
         :children
         (map (fn [result-map]
-               {:fx/type :h-box
+               {:fx/type :v-box
                 :v-box/margin {:left 16
                                :right 16
                                :bottom 16}
@@ -62,8 +62,17 @@
                         :-fx-border-width 1}
                 :children
                 [{:fx/type :label
-                  :padding 16
-                  :text (str (result-map :mdl/file) "\n" (result-map :mdl/match))}]})
+                  :v-box/margin {:left 16 :right 16 :top 16 :bottom 4}
+                  :text (result-map :mdl/name)}
+                 {:fx/type :label
+                  :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
+                  :text (result-map :mdl/path)}
+                 {:fx/type :label
+                  :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
+                  :text (result-map :mdl/link)}
+                 {:fx/type :label
+                  :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
+                  :text (result-map :mdl/text)}]})
              (state-map :mdl/results))}})}}})
 
 (defn- wrap-long-lines
@@ -90,8 +99,11 @@
   (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
 
 (defn- str->result [string]
-  {:mdl/file "TODO"
-   :mdl/match (wrap-long-lines string 100)})
+  {:mdl/name "TODO"
+   :mdl/path "C:/Users/chris/TODO.md"
+   :mdl/link "obsidian://TODO"
+   :mdl/line-number 123
+   :mdl/text (wrap-long-lines string 100)})
 
 (defn- update-on-search-output-received [state-hash search-output-json-str]
   (let [split-output-vec (str/split search-output-json-str #"\n")
