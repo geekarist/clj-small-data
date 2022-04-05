@@ -64,15 +64,20 @@
   [string width]
   (loop [i 0
          acc ""]
-    (if (>= i (.length string))
-      acc
-      (recur (inc i)
-             (str acc
-                  (nth string i)
-                  (if (and (not= 0 i)
-                           (= 0 (mod i width)))
-                    "\n"
-                    ""))))))
+    (letfn [(out-of-bounds? [string i]
+              (>= i (.length string)))
+            (next-index-fn [i] (inc i))
+            (mult? [width i]
+              (and (not= 0 i)
+                   (= 0 (mod i width))))
+            (next-acc-fn [string width i acc]
+              (str acc
+                   (nth string i)
+                   (if (mult? width i) "\n" "")))]
+      (if (out-of-bounds? string i)
+        acc
+        (recur (next-index-fn i)
+               (next-acc-fn string width i acc))))))
 
 (comment
   (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
