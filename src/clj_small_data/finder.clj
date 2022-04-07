@@ -98,17 +98,18 @@
 (comment
   (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
 
-(defn- str->result [string]
+(defn- json->result [json-str]
   {:mdl/name "TODO"
    :mdl/path "C:/Users/chris/TODO.md"
    :mdl/link "obsidian://TODO"
    :mdl/line-number 123
-   :mdl/text (wrap-long-lines string 100)})
+   :mdl/text (wrap-long-lines json-str 100)})
 
-(defn- update-on-search-output-received [state-hash search-output-json-str]
-  (let [split-output-vec (str/split search-output-json-str #"\n")
-        results (map str->result split-output-vec)]
-    (assoc state-hash :mdl/results results)))
+(defn- new-state-on-search-output-received [state-hash search-output-json-str]
+  (let [split-output-json-vec (str/split search-output-json-str #"\n")
+        results (map json->result split-output-json-vec)]
+    (assoc state-hash
+           :mdl/results results)))
 
 (defn update [state-hash event-key event-val]
 
@@ -137,7 +138,7 @@
 
     :evt/search-output-received
     (let [new-state-hash
-          (update-on-search-output-received state-hash event-val)]
+          (new-state-on-search-output-received state-hash event-val)]
       [new-state-hash nil])
 
     :evt/log-btn-pressed
