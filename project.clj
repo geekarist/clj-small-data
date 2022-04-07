@@ -4,5 +4,7 @@
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [cljfx "1.7.19"]]
+                 [cljfx "1.7.19"]
+                 [org.clojure/data.json "2.4.1-SNAPSHOT"
+                  cljs-ajax "0.8.4"]]
   :repl-options {:init-ns clj-small-data.core})
