@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [update])
   (:require [cljfx.api :as fx]
             [clojure.java.shell :as shell]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.data.json :as json]))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -99,15 +100,25 @@
   (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
 
 (defn- json->result [json-str]
-  {:mdl/name "TODO"
-   :mdl/path "C:/Users/chris/TODO.md"
-   :mdl/link "obsidian://TODO"
-   :mdl/line-number 123
-   :mdl/text (wrap-long-lines json-str 100)})
+  (let [json-deserialized (json/read-str json-str :key-fn keyword)
+        type-str (some-> json-deserialized :type)
+        data-map (some-> json-deserialized :data)
+        path-map (some-> data-map :path)
+        path-str (some-> path-map :text)
+        file-name-str (when path-str (last (str/split path-str #"[/\\]")))
+        name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))]
+    (when (= type-str "match")
+      {:mdl/name name-str
+       :mdl/path path-str
+       :mdl/link "obsidian://TODO"
+       :mdl/line-number 123
+       :mdl/text "TODO"})))
 
 (defn- new-state-on-search-output-received [state-hash search-output-json-str]
   (let [split-output-json-vec (str/split search-output-json-str #"\n")
-        results (map json->result split-output-json-vec)]
+        results (->> split-output-json-vec
+                     (map json->result)
+                     (filter some?))]
     (assoc state-hash
            :mdl/results results)))
 
