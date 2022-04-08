@@ -79,22 +79,23 @@
 (defn- wrap-long-lines
   "Take `string` and insert line endings every `width` characters."
   [string width]
-  (loop [i 0
-         acc ""]
-    (letfn [(out-of-bounds? [string i]
-              (>= i (.length string)))
-            (next-index-fn [i] (inc i))
-            (mult? [width i]
-              (and (not= 0 i)
-                   (= 0 (mod i width))))
-            (next-acc-fn [string width i acc]
-              (str acc
-                   (nth string i)
-                   (if (mult? width i) "\n" "")))]
-      (if (out-of-bounds? string i)
-        acc
-        (recur (next-index-fn i)
-               (next-acc-fn string width i acc))))))
+  (when string
+    (loop [i 0
+           acc ""]
+      (letfn [(out-of-bounds? [string i]
+                (>= i (.length string)))
+              (next-index-fn [i] (inc i))
+              (mult? [width i]
+                (and (not= 0 i)
+                     (= 0 (mod i width))))
+              (next-acc-fn [string width i acc]
+                (str acc
+                     (nth string i)
+                     (if (mult? width i) "\n" "")))]
+        (if (out-of-bounds? string i)
+          acc
+          (recur (next-index-fn i)
+                 (next-acc-fn string width i acc)))))))
 
 (comment
   (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
@@ -105,14 +106,19 @@
         data-map (some-> json-deserialized :data)
         path-map (some-> data-map :path)
         path-str (some-> path-map :text)
+        path-wrapped-str (wrap-long-lines path-str 80)
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
-        name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))]
+        name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
+        lines-map (some-> data-map :lines)
+        text-str (some-> lines-map
+                         :text
+                         (wrap-long-lines 80))]
     (when (= type-str "match")
       {:mdl/name name-str
-       :mdl/path path-str
+       :mdl/path path-wrapped-str
        :mdl/link "obsidian://TODO"
        :mdl/line-number 123
-       :mdl/text "TODO"})))
+       :mdl/text text-str})))
 
 (defn- new-state-on-search-output-received [state-hash search-output-json-str]
   (let [split-output-json-vec (str/split search-output-json-str #"\n")
