@@ -7,6 +7,7 @@
 
 (def init
   {:mdl/title "Small Data Finder"
+   :mdl/kb-path "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
    :mdl/search-text ""
    :mdl/search-field-placeholder "Please enter your search text"
    :mdl/results
@@ -128,17 +129,17 @@
     (assoc state-hash
            :mdl/results results)))
 
-(defn update [state-hash event-key event-val]
+(defn update [state-map event-key event-val]
 
   (condp = event-key
 
     :evt/change-search-query
-    (let [new-state-hash (assoc state-hash :mdl/search-text event-val)
+    (let [new-state-hash (assoc state-map :mdl/search-text event-val)
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
     :evt/redraw-btn-pressed
-    (let [new-state-hash state-hash
+    (let [new-state-hash state-map
           new-effect-vec nil]
       [new-state-hash new-effect-vec])
 
@@ -148,36 +149,30 @@
       [new-state-hash new-effect-vec])
 
     :evt/search-btn-pressed
-    (let [new-state-hash state-hash
+    (let [new-state-hash state-map
           new-effect-vec
-          [:eff/search (state-hash :mdl/search-text)]]
+          [:eff/search [(state-map :mdl/kb-path) (state-map :mdl/search-text)]]]
       [new-state-hash new-effect-vec])
 
     :evt/search-output-received
     (let [new-state-hash
-          (new-state-on-search-output-received state-hash event-val)]
+          (new-state-on-search-output-received state-map event-val)]
       [new-state-hash nil])
 
     :evt/log-btn-pressed
-    (let [new-state-hash state-hash
-          new-effect-vec [:eff/log state-hash]]
+    (let [new-state-hash state-map
+          new-effect-vec [:eff/log state-map]]
       [new-state-hash new-effect-vec])
 
     (do (println "Unknown message key:" event-key)
-        [state-hash nil])))
+        [state-map nil])))
 
-;; (def SEARCH_DIR "/Volumes/GoogleDrive/My Drive/DriveSyncFiles/PERSO-KB")
-(def SEARCH_DIR "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB")
-
-(defn- search-file! [query dispatch!]
+(defn- search-file! [[search-dir query] dispatch!]
   (future
-    (let [result (shell/sh "rg" "--json" query SEARCH_DIR)
+    (let [result (shell/sh "rg" "--json" query search-dir)
           output (result :out)]
       (fx/on-fx-thread
        (dispatch! [:evt/search-output-received output])))))
-
-(comment
-  (search-file! "hello" #(println (nth % 1))))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
