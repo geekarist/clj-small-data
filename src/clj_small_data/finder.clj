@@ -98,9 +98,6 @@
           (recur (next-index-fn i)
                  (next-acc-fn string width i acc)))))))
 
-(comment
-  (wrap-long-lines (str/join (take 10000 (repeat "0123456789"))) 10))
-
 (defn- json->result [json-str]
   (let [json-deserialized (json/read-str json-str :key-fn keyword)
         type-str (some-> json-deserialized :type)

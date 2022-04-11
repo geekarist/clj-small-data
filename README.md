@@ -11,7 +11,7 @@ A desktop application that lets you search all your personal data that is stored
 
 ## Install
 
-TODO
+See [TODO.md](TODO.md)
 
 ## Features
 
