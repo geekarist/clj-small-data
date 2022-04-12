@@ -42,7 +42,7 @@
         ;; Buttons
         {:fx/type :button :text "Clear"
          :on-action (fn [_] (dispatch! [:evt/clear-btn-pressed]))}
-        {:fx/type :button :text "Search" :h-box/margin {:left 8}
+        {:fx/type :button :text "Find" :h-box/margin {:left 8}
          :on-action (fn [_] (dispatch! [:evt/search-btn-pressed]))}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
          :on-action (fn [_] (dispatch! [:evt/redraw-btn-pressed]))}

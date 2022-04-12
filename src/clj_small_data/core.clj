@@ -19,9 +19,8 @@
     (fn [state-val]
       {:fx/type finder/view :state state-val :dispatch dispatch!}))))
 
-#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
-(defonce _mounted-renderer
+(defn -main []
+  (fx/unmount-renderer state-atom renderer)
   (fx/mount-renderer state-atom renderer))
 
-(comment
-  (println @state-atom))
+(-main)
