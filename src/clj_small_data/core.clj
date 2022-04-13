@@ -21,7 +21,6 @@
       {:fx/type finder/view :state state-val :dispatch dispatch!}))))
 
 (defn -main []
-  (fx/unmount-renderer state-atom renderer)
   (fx/mount-renderer state-atom renderer)
   (dispatch! [:evt/raise-requested]))
 
