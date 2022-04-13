@@ -6,11 +6,12 @@
   (atom finder/init))
 
 (defn- dispatch! [[msg-key msg-val :as _message-vec]]
-  (let [update-result-vec (finder/update @state-atom msg-key msg-val)
-        [new-state-hash new-effect-vec] update-result-vec
-        get-new-state-hash (fn [_current-state-hash] new-state-hash)]
-    (swap! state-atom get-new-state-hash)
-    (finder/effect! new-effect-vec dispatch!)))
+  (fx/on-fx-thread
+   (let [update-result-vec (finder/update @state-atom msg-key msg-val)
+         [new-state-hash new-effect-vec] update-result-vec
+         get-new-state-hash (fn [_current-state-hash] new-state-hash)]
+     (swap! state-atom get-new-state-hash)
+     (finder/effect! new-effect-vec dispatch!))))
 
 (def renderer
   (fx/create-renderer
@@ -21,6 +22,7 @@
 
 (defn -main []
   (fx/unmount-renderer state-atom renderer)
-  (fx/mount-renderer state-atom renderer))
+  (fx/mount-renderer state-atom renderer)
+  (dispatch! [:evt/raise-requested]))
 
 (-main)

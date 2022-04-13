@@ -7,6 +7,7 @@
 
 (def init
   {:mdl/title "Small Data Finder"
+   :mdl/iconified false
    :mdl/kb-path "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
    :mdl/search-text ""
    :mdl/search-field-placeholder "Please enter your search text"
@@ -17,6 +18,7 @@
 
   ;; Window
   {:fx/type :stage :showing true :title (state-map :mdl/title)
+   :iconified (state-map :mdl/iconified)
    :width 600 :height 600
 
    ;; Main container
@@ -161,6 +163,21 @@
           new-effect-vec [:eff/log state-map]]
       [new-state-hash new-effect-vec])
 
+    :evt/raise-requested
+    (let [new-state-hash state-map
+          new-effect-vec [:eff/raise-window]]
+      [new-state-hash new-effect-vec])
+
+    :evt/iconify-requested
+    (let [new-state-map (assoc state-map :mdl/iconified true)
+          new-effect-vec nil]
+      [new-state-map new-effect-vec])
+
+    :evt/deiconify-requested
+    (let [new-state-map (assoc state-map :mdl/iconified false)
+          new-effect-vec nil]
+      [new-state-map new-effect-vec])
+
     (do (println "Unknown message key:" event-key)
         [state-map nil])))
 
@@ -168,13 +185,18 @@
   (future
     (let [result (shell/sh "rg" "--json" query search-dir)
           output (result :out)]
-      (fx/on-fx-thread
-       (dispatch! [:evt/search-output-received output])))))
+      (dispatch! [:evt/search-output-received output]))))
+
+(defn- raise-window! [dispatch!]
+  (dispatch! [:evt/iconify-requested])
+  (future
+    (dispatch! [:evt/deiconify-requested])))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
     :eff/search (search-file! value dispatch!)
     :eff/log (println "State:" value)
+    :eff/raise-window (raise-window! dispatch!)
     nil nil ; Ignore `nil` effect
     (println "Effect not found:" key)))
 
