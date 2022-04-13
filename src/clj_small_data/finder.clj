@@ -1,9 +1,9 @@
 (ns clj-small-data.finder
   (:refer-clojure :exclude [update])
-  (:require [cljfx.api :as fx]
-            [clojure.java.shell :as shell]
-            [clojure.string :as str]
-            [clojure.data.json :as json]))
+  (:require
+   [clojure.java.shell :as shell]
+   [clojure.string :as str]
+   [clojure.data.json :as json]))
 
 (def init
   {:mdl/title "Small Data Finder"
