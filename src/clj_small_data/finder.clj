@@ -107,8 +107,9 @@
   ;; result: "obsidian://open?vault=c-kb&file=ab%20cd.md"
   (let [vault-str (-> kb-path-str File. .getName)
         file-str (-> path-str File. .getName)
-        file-no-ext-str (str/replace file-str #".md$" "")]
-    (format "obsidian://open?vault=%s&file=%s" vault-str file-no-ext-str)))
+        file-no-ext-str (str/replace file-str #".md$" "")
+        file-encoded-str (java.net.URLEncoder/encode file-no-ext-str "UTF-8")]
+    (format "obsidian://open?vault=%s&file=%s" vault-str file-encoded-str)))
 
 (defn- json->result [kb-path-str json-str]
   (let [json-deserialized (json/read-str json-str :key-fn keyword)
