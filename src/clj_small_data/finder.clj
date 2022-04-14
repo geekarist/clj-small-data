@@ -3,7 +3,8 @@
   (:require
    [clojure.java.shell :as shell]
    [clojure.string :as str]
-   [clojure.data.json :as json]))
+   [clojure.data.json :as json])
+  (:import (java.io File)))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -100,7 +101,16 @@
           (recur (next-index-fn i)
                  (next-acc-fn string width i acc)))))))
 
-(defn- json->result [json-str]
+(defn- path->uri [kb-path-str path-str]
+  ;; kb-path-str: "c:\a\b\c-kb"
+  ;; path-str: "c:\a\b\c-kb\ab cd.md"
+  ;; result: "obsidian://open?vault=c-kb&file=ab%20cd.md"
+  (let [vault-str (-> kb-path-str File. .getName)
+        file-str (-> path-str File. .getName)
+        file-no-ext-str (str/replace file-str #".md$" "")]
+    (format "obsidian://open?vault=%s&file=%s" vault-str file-no-ext-str)))
+
+(defn- json->result [kb-path-str json-str]
   (let [json-deserialized (json/read-str json-str :key-fn keyword)
         type-str (some-> json-deserialized :type)
         data-map (some-> json-deserialized :data)
@@ -116,17 +126,17 @@
     (when (= type-str "match")
       {:mdl/name name-str
        :mdl/path path-wrapped-str
-       :mdl/link "obsidian://TODO"
+       :mdl/link (path->uri kb-path-str path-str)
        :mdl/line-number 123
        :mdl/text text-str})))
 
-(defn- new-state-on-search-output-received [state-hash search-output-json-str]
+(defn- new-state-on-search-output-received [state-map search-output-json-str]
   (let [split-output-json-vec (str/split search-output-json-str #"\n")
-        results (->> split-output-json-vec
-                     (map json->result)
-                     (filter some?))]
-    (assoc state-hash
-           :mdl/results results)))
+        kb-path-str (state-map :mdl/kb-path)
+        mdl-item-map (map (fn [json-str] (json->result kb-path-str json-str))
+                          split-output-json-vec)
+        results (filter some? mdl-item-map)]
+    (assoc state-map :mdl/results results)))
 
 (defn update [state-map event-key event-val]
 
