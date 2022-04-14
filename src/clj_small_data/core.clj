@@ -20,8 +20,11 @@
     (fn [state-val]
       {:fx/type finder/view :state state-val :dispatch dispatch!}))))
 
+(defn apply-changes! []
+  (dispatch! [:evt/raise-requested]))
+
 (defn -main []
   (fx/mount-renderer state-atom renderer)
-  (dispatch! [:evt/raise-requested]))
+  (apply-changes!))
 
 (-main)
