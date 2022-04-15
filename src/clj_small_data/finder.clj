@@ -72,9 +72,11 @@
                  {:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
                   :text (result-map :mdl/path)}
-                 {:fx/type :label
+                 {:fx/type :hyperlink
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-                  :text (result-map :mdl/link)}
+                  :text (result-map :mdl/link)
+                  :on-action
+                  (fn [_] (dispatch! [:evt/link-clicked (result-map :mdl/link)]))}
                  {:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
                   :text (result-map :mdl/text)}]})
@@ -109,7 +111,8 @@
         file-str (-> path-str File. .getName)
         file-no-ext-str (str/replace file-str #".md$" "")
         file-encoded-str (java.net.URLEncoder/encode file-no-ext-str "UTF-8")]
-    (format "obsidian://open?vault=%s&file=%s" vault-str file-encoded-str)))
+    (format "obsidian://open?vault=%s&file=%s" vault-str file-encoded-str)
+    (format "https://google.com/search?q=%s+%s" vault-str file-encoded-str)))
 
 (defn- json->result [kb-path-str json-str]
   (let [json-deserialized (json/read-str json-str :key-fn keyword)
@@ -139,7 +142,7 @@
         results (filter some? mdl-item-map)]
     (assoc state-map :mdl/results results)))
 
-(defn update [state-map event-key event-val]
+(defn advance [state-map event-key event-val]
 
   (condp = event-key
 
@@ -188,6 +191,10 @@
     (let [new-state-map (assoc state-map :mdl/iconified false)
           new-effect-vec nil]
       [new-state-map new-effect-vec])
+
+    :evt/link-clicked
+    (do (println "Link clicked:" event-key event-val)
+        [state-map nil])
 
     (do (println "Unknown message key:" event-key)
         [state-map nil])))

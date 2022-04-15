@@ -7,7 +7,7 @@
 
 (defn- dispatch! [[msg-key msg-val :as _message-vec]]
   (fx/on-fx-thread
-   (let [update-result-vec (finder/update @state-atom msg-key msg-val)
+   (let [update-result-vec (finder/advance @state-atom msg-key msg-val)
          [new-state-hash new-effect-vec] update-result-vec
          get-new-state-hash (fn [_current-state-hash] new-state-hash)]
      (swap! state-atom get-new-state-hash)
