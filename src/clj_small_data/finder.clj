@@ -4,7 +4,8 @@
    [clojure.java.shell :as shell]
    [clojure.string :as str]
    [clojure.data.json :as json])
-  (:import (java.io File)))
+  (:import (java.io File)
+           (javafx.stage Window)))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -193,8 +194,8 @@
       [new-state-map new-effect-vec])
 
     :evt/link-clicked
-    (do (println "Link clicked:" event-key event-val)
-        [state-map nil])
+    (let [new-effect-vec [:eff/open-uri event-val]]
+      [state-map new-effect-vec])
 
     (do (println "Unknown message key:" event-key)
         [state-map nil])))
@@ -210,11 +211,19 @@
   (future
     (dispatch! [:evt/deiconify-requested])))
 
+(defn- open-uri! [uri]
+  (-> (Window/getWindows)
+      (first)
+      (.getApplication)
+      (.getHostServices)
+      (.showDocument uri)))
+
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
     :eff/search (search-file! value dispatch!)
     :eff/log (println "State:" value)
     :eff/raise-window (raise-window! dispatch!)
+    :eff/open-uri (open-uri! value)
     nil nil ; Ignore `nil` effect
     (println "Effect not found:" key)))
 
