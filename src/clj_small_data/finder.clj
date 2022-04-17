@@ -5,7 +5,8 @@
    [clojure.string :as str]
    [clojure.data.json :as json])
   (:import (java.io File)
-           (javafx.stage Window)))
+           (java.awt Desktop)
+           (java.net URI)))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -111,9 +112,11 @@
   (let [vault-str (-> kb-path-str File. .getName)
         file-str (-> path-str File. .getName)
         file-no-ext-str (str/replace file-str #".md$" "")
-        file-encoded-str (java.net.URLEncoder/encode file-no-ext-str "UTF-8")]
-    (format "obsidian://open?vault=%s&file=%s" vault-str file-encoded-str)
-    (format "https://google.com/search?q=%s+%s" vault-str file-encoded-str)))
+        file-encoded-str (java.net.URLEncoder/encode file-no-ext-str "UTF-8")
+        file-encoded-fixed-str (str/replace file-encoded-str "+" "%20")
+        uri-pattern "obsidian://open?vault=%s&file=%s"
+        uri (format uri-pattern vault-str file-encoded-fixed-str)]
+    uri))
 
 (defn- json->result [kb-path-str json-str]
   (let [json-deserialized (json/read-str json-str :key-fn keyword)
@@ -212,11 +215,8 @@
     (dispatch! [:evt/deiconify-requested])))
 
 (defn- open-uri! [uri]
-  (-> (Window/getWindows)
-      (first)
-      (.getApplication)
-      (.getHostServices)
-      (.showDocument uri)))
+  (-> (Desktop/getDesktop)
+      (.browse (URI. uri))))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
