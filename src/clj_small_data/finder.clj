@@ -215,8 +215,12 @@
     (dispatch! [:evt/deiconify-requested])))
 
 (defn- open-uri! [uri]
-  (-> (Desktop/getDesktop)
-      (.browse (URI. uri))))
+  (let [runtime (Runtime/getRuntime)
+        obsidian-exe-path-str "C:\\Users\\chris\\AppData\\Local\\Obsidian\\Obsidian.exe"
+        cmd-arr (into-array [obsidian-exe-path-str uri])]
+    (println "Command vector:" [obsidian-exe-path-str uri])
+    (println "Command array:" cmd-arr)
+    (.exec runtime cmd-arr)))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
