@@ -216,15 +216,17 @@
     (dispatch! [:evt/deiconify-requested])))
 
 (defn- open-uri! [uri]
-  (let [runtime (Runtime/getRuntime)
-        cmd-path-str "powershell.exe"
-        quoted-uri-str (str "\"'" uri "\"'")
-        cmd-vec [cmd-path-str "-Command" "start-process" quoted-uri-str]
-        cmd-arr (into-array cmd-vec)
-        process (.exec runtime cmd-arr)
-        output-str (slurp (.getInputStream process))
-        error-str (slurp (.getErrorStream process))]
-    (timbre/debug "Command vector:" cmd-vec)
+  (timbre/debug "Opening URI...")
+  (let [quoted-uri-str (str "\"'" uri "\"'")
+        cmd-result-map (timbre/spy
+                        (shell/sh "powershell.exe"
+                                  "-Command"
+                                  "start-process"
+                                  quoted-uri-str))
+        exit-code-num (:exit cmd-result-map)
+        output-str (:out cmd-result-map)
+        error-str (:err cmd-result-map)]
+    (timbre/debug "Command exit code:" exit-code-num)
     (timbre/debug "Command output:" output-str)
     (timbre/debug "Command error:" error-str)))
 
