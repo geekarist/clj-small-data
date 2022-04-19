@@ -3,7 +3,8 @@
   (:require
    [clojure.java.shell :as shell]
    [clojure.string :as str]
-   [clojure.data.json :as json])
+   [clojure.data.json :as json]
+   [taoensso.timbre :as timbre])
   (:import (java.io File)
            (java.awt Desktop)
            (java.net URI)))
@@ -216,11 +217,16 @@
 
 (defn- open-uri! [uri]
   (let [runtime (Runtime/getRuntime)
-        obsidian-exe-path-str "C:\\Users\\chris\\AppData\\Local\\Obsidian\\Obsidian.exe"
-        cmd-arr (into-array [obsidian-exe-path-str uri])]
-    (println "Command vector:" [obsidian-exe-path-str uri])
-    (println "Command array:" cmd-arr)
-    (.exec runtime cmd-arr)))
+        cmd-path-str "powershell.exe"
+        quoted-uri-str (str "\"'" uri "\"'")
+        cmd-vec [cmd-path-str "-Command" "start-process" quoted-uri-str]
+        cmd-arr (into-array cmd-vec)
+        process (.exec runtime cmd-arr)
+        output-str (slurp (.getInputStream process))
+        error-str (slurp (.getErrorStream process))]
+    (timbre/debug "Command vector:" cmd-vec)
+    (timbre/debug "Command output:" output-str)
+    (timbre/debug "Command error:" error-str)))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key

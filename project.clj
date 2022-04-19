@@ -6,5 +6,6 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [cljfx "1.7.19"]
                  [org.clojure/data.json "2.4.1-SNAPSHOT"]
-                 [cljs-ajax "0.8.4"]]
+                 [cljs-ajax "0.8.4"]
+                 [com.taoensso/timbre "5.2.1"]]
   :repl-options {:init-ns clj-small-data.core})
