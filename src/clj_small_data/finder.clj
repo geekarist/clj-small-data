@@ -7,7 +7,8 @@
    [taoensso.timbre :as timbre])
   (:import (java.io File)
            (java.awt Desktop)
-           (java.net URI)))
+           (java.net URI)
+           (com.profesorfalken.jpowershell PowerShell)))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -217,18 +218,10 @@
 
 (defn- open-uri! [uri]
   (timbre/debug "Opening URI...")
-  (let [quoted-uri-str (str "\"'" uri "\"'")
-        cmd-result-map (timbre/spy
-                        (shell/sh "powershell.exe"
-                                  "-Command"
-                                  "start-process"
-                                  quoted-uri-str))
-        exit-code-num (:exit cmd-result-map)
-        output-str (:out cmd-result-map)
-        error-str (:err cmd-result-map)]
-    (timbre/debug "Command exit code:" exit-code-num)
-    (timbre/debug "Command output:" output-str)
-    (timbre/debug "Command error:" error-str)))
+  (let [quoted-uri-str (str "\"" uri "\"")
+        powershell-cmd-str (format "Start-Process %s" quoted-uri-str)
+        powershell-cmd-resp (PowerShell/executeSingleCommand powershell-cmd-str)]
+    (timbre/debug powershell-cmd-resp)))
 
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
