@@ -1,14 +1,13 @@
 (ns clj-small-data.finder
   (:refer-clojure :exclude [update])
+  #_{:clj-kondo/ignore [:unused-namespace]}
   (:require
    [clojure.java.shell :as shell]
    [clojure.string :as str]
    [clojure.data.json :as json]
-   [taoensso.timbre :as timbre])
-  (:import (java.io File)
-           (java.awt Desktop)
-           (java.net URI)
-           (com.profesorfalken.jpowershell PowerShell)))
+   [taoensso.timbre :as timbre]
+   [clj-uri.core :as curi])
+  (:import (java.io File)))
 
 (def init
   {:mdl/title "Small Data Finder"
@@ -216,19 +215,12 @@
   (future
     (dispatch! [:evt/deiconify-requested])))
 
-(defn- open-uri! [uri]
-  (timbre/debug "Opening URI...")
-  (let [quoted-uri-str (str "\"" uri "\"")
-        powershell-cmd-str (format "Start-Process %s" quoted-uri-str)
-        powershell-cmd-resp (PowerShell/executeSingleCommand powershell-cmd-str)]
-    (timbre/debug powershell-cmd-resp)))
-
 (defn effect! [[key value :as _new-effect-vec] dispatch!]
   (condp = key
     :eff/search (search-file! value dispatch!)
     :eff/log (println "State:" value)
     :eff/raise-window (raise-window! dispatch!)
-    :eff/open-uri (open-uri! value)
+    :eff/open-uri (curi/open! value)
     nil nil ; Ignore `nil` effect
     (println "Effect not found:" key)))
 
