@@ -10,7 +10,8 @@
              ps-script-file (File/createTempFile "clj-uri-open" ".ps1")
              ps-script-path-str (-> ps-script-file (.getPath))
              _ (spit ps-script-file ps-cmd-str)
-             cmd-resp (shell/sh "wt" "PowerShell" ps-script-path-str)]
+             ;; cmd-resp (shell/sh "wt" "PowerShell" ps-script-path-str)
+             cmd-resp (shell/sh "powershell" ps-script-path-str)]
          (timbre/debug "PowerShell script-path" (-> ps-script-file (.getPath)))
          (timbre/debug "Command response:" cmd-resp))
        (catch Exception e
