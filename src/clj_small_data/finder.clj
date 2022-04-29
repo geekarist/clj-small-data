@@ -147,7 +147,7 @@
         results (filter some? mdl-item-map)]
     (assoc state-map :mdl/results results)))
 
-(defn advance [state-map event-key event-val]
+(defn updatf [state-map event-key event-val]
 
   (condp = event-key
 
