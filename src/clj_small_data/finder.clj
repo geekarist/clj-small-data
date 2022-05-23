@@ -11,19 +11,19 @@
   (:import (java.io File)))
 
 (def init
-  {:mdl/title "Small Data Finder"
-   :mdl/iconified false
-   :mdl/kb-path "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
-   :mdl/search-text ""
-   :mdl/search-field-placeholder "Please enter your search text"
-   :mdl/results
+  {::mdl:title "Small Data Finder"
+   ::mdl:iconified false
+   ::mdl:kb-path "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
+   ::mdl:search-text ""
+   ::mdl:search-field-placeholder "Please enter your search text"
+   ::mdl:results
    []})
 
 (defn view [state-map]
 
   ;; Window
-  {:fx/type :stage :showing true :title (state-map :mdl/title)
-   :iconified (state-map :mdl/iconified)
+  {:fx/type :stage :showing true :title (state-map ::mdl:title)
+   :iconified (state-map ::mdl:iconified)
    :width 600 :height 600
 
    ;; Main container
@@ -42,19 +42,19 @@
 
        [;; Query
         {:fx/type :text-field
-         :h-box/hgrow :always :text (state-map :mdl/search-text)
-         :prompt-text (state-map :mdl/search-field-placeholder)
-         :on-text-changed {::evt-type ::evt-type=change-search-query}}
+         :h-box/hgrow :always :text (state-map ::mdl:search-text)
+         :prompt-text (state-map ::mdl:search-field-placeholder)
+         :on-text-changed {::evt-type ::evt-type:change-search-query}}
 
         ;; Buttons
         {:fx/type :button :text "Clear" :h-box/margin {:left 8}
-         :on-action {::evt-type ::evt-type=clear-btn-pressed}}
+         :on-action {::evt-type ::evt-type:clear-btn-pressed}}
         {:fx/type :button :text "Find" :h-box/margin {:left 4}
-         :on-action {::evt-type ::evt-type=search-btn-pressed}}
+         :on-action {::evt-type ::evt-type:search-btn-pressed}}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action {::evt-type ::evt-type=redraw-btn-pressed}}
+         :on-action {::evt-type ::evt-type:redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action {::evt-type ::evt-type=log-btn-pressed}}]}
+         :on-action {::evt-type ::evt-type:log-btn-pressed}}]}
 
        ;; List of results
       {:fx/type :scroll-pane
@@ -72,20 +72,20 @@
                 :children
                 [{:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 16 :bottom 4}
-                  :text (result-map :mdl/name)}
+                  :text (result-map ::mdl:name)}
                  {:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-                  :text (result-map :mdl/path)}
+                  :text (result-map ::mdl:path)}
                  {:fx/type :hyperlink
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-                  :text (result-map :mdl/link)
+                  :text (result-map ::mdl:link)
                   :on-action
-                  {::evt-type ::evt-type=link-clicked
-                   ::evt-arg (result-map :mdl/link)}}
+                  {::evt-type ::evt-type:link-clicked
+                   ::evt-arg (result-map ::mdl:link)}}
                  {:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
-                  :text (result-map :mdl/text)}]})
-             (state-map :mdl/results))}})}}})
+                  :text (result-map ::mdl:text)}]})
+             (state-map ::mdl:results))}})}}})
 
 (defn- wrap-long-lines
   "Take `string` and insert line endings every `width` characters."
@@ -134,52 +134,52 @@
                          :text
                          (wrap-long-lines 80))]
     (when (= type-str "match")
-      {:mdl/name name-str
-       :mdl/path path-wrapped-str
-       :mdl/link (path->uri kb-path-str path-str)
-       :mdl/line-number 123
-       :mdl/text text-str})))
+      {::mdl:name name-str
+       ::mdl:path path-wrapped-str
+       ::mdl:link (path->uri kb-path-str path-str)
+       ::mdl:line-number 123
+       ::mdl:text text-str})))
 
 (defn- new-state-on-search-output-received [state-map search-output-json-str]
   (let [split-output-json-vec (str/split search-output-json-str #"\n")
-        kb-path-str (state-map :mdl/kb-path)
+        kb-path-str (state-map ::mdl:kb-path)
         mdl-item-map (map (fn [json-str] (json->result kb-path-str json-str))
                           split-output-json-vec)
         results (filter some? mdl-item-map)]
-    (assoc state-map :mdl/results results)))
+    (assoc state-map ::mdl:results results)))
 
 (defmulti upset ::evt-type)
 
-(defmethod upset ::evt-type=change-search-query
+(defmethod upset ::evt-type:change-search-query
   [{:keys [::runtime/coe-state fx/event]}]
   (println "Search query changed:" event)
-  {::runtime/eff-state (assoc coe-state :mdl/search-text event)})
+  {::runtime/eff:state (assoc coe-state ::mdl:search-text event)})
 
-(defmethod upset ::evt-type=redraw-btn-pressed
+(defmethod upset ::evt-type:redraw-btn-pressed
   [{:keys [::runtime/coe-state]}]
-  {::runtime/eff-state coe-state})
+  {::runtime/eff:state coe-state})
 
-(defmethod upset ::evt-type=clear-btn-pressed
+(defmethod upset ::evt-type:clear-btn-pressed
   [_arg]
-  {::runtime/eff-state init})
+  {::runtime/eff:state init})
 
-(defmethod upset ::evt-type=search-btn-pressed
+(defmethod upset ::evt-type:search-btn-pressed
   [{:keys [::runtime/coe-state]}]
-  {::eff-search [(coe-state :mdl/kb-path) (coe-state :mdl/search-text)]})
+  {::eff:search [(coe-state ::mdl:kb-path) (coe-state ::mdl:search-text)]})
 
-(defmethod upset ::evt-type=search-output-received
+(defmethod upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::evt-arg]}]
   (println "Event:" evt-arg)
-  {::runtime/eff-state
+  {::runtime/eff:state
    (new-state-on-search-output-received coe-state evt-arg)})
 
-(defmethod upset ::evt-type=log-btn-pressed
+(defmethod upset ::evt-type:log-btn-pressed
   [{:keys [::runtime/coe-state]}]
-  {::runtime/eff-log coe-state})
+  {::runtime/eff:log coe-state})
 
-(defmethod upset ::evt-type=link-clicked
+(defmethod upset ::evt-type:link-clicked
   [{:keys [::evt-arg]}]
-  {::eff-open-uri evt-arg})
+  {::eff:open-uri evt-arg})
 
 (defn- search-file! [[search-dir query] dispatch!]
   (println (format "Searching into %s query %s" search-dir query))
@@ -188,10 +188,10 @@
           _ (println (format "Search result: %s" result))
           output (result :out)
           _ (println (format "Standard output: %s" output))]
-      (dispatch! {::evt-type ::evt-type=search-output-received ::evt-arg output}))))
+      (dispatch! {::evt-type ::evt-type:search-output-received ::evt-arg output}))))
 
 (def effects
-  {::eff-search (fn [value dispatch!] (search-file! value dispatch!))
-   ::eff-open-uri (fn [value _dispatch!] (curi/open! value))})
+  {::eff:search (fn [value dispatch!] (search-file! value dispatch!))
+   ::eff:open-uri (fn [value _dispatch!] (curi/open! value))})
 
 (def coeffects {})

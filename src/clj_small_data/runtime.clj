@@ -23,8 +23,8 @@
                           ::coe-state #(fx/sub-val (deref context-atom) identity))
                    :effects
                    (assoc effects
-                          ::eff-log #(log! %1 %2)
-                          ::eff-state #(set-state! context-atom %1 %2))
+                          ::eff:log #(log! %1 %2)
+                          ::eff:state #(set-state! context-atom %1 %2))
                    :desc-fn (fn [_]
                               {:fx/type #(view-context % (get-view-fn))}))))
 
