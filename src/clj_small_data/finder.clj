@@ -6,7 +6,8 @@
    [clojure.string :as str]
    [clojure.data.json :as json]
    [taoensso.timbre :as timbre]
-   [clj-uri.core :as curi])
+   [clj-uri.core :as curi]
+   [clj-small-data.runtime :as runtime])
   (:import (java.io File)))
 
 (def init
@@ -18,7 +19,7 @@
    :mdl/results
    []})
 
-(defn view [{state-map :state dispatch! :dispatch}]
+(defn view [state-map]
 
   ;; Window
   {:fx/type :stage :showing true :title (state-map :mdl/title)
@@ -43,17 +44,17 @@
         {:fx/type :text-field
          :h-box/hgrow :always :text (state-map :mdl/search-text)
          :prompt-text (state-map :mdl/search-field-placeholder)
-         :on-text-changed #(dispatch! [:evt/change-search-query %])}
+         :on-text-changed {::evt-type ::evt-type=change-search-query}}
 
         ;; Buttons
         {:fx/type :button :text "Clear" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:evt/clear-btn-pressed]))}
+         :on-action {::evt-type ::evt-type=clear-btn-pressed}}
         {:fx/type :button :text "Find" :h-box/margin {:left 4}
-         :on-action (fn [_] (dispatch! [:evt/search-btn-pressed]))}
+         :on-action {::evt-type ::evt-type=search-btn-pressed}}
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action (fn [_] (dispatch! [:evt/redraw-btn-pressed]))}
+         :on-action {::evt-type ::evt-type=redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action (fn [_] (dispatch! [:evt/log-btn-pressed]))}]}
+         :on-action {::evt-type ::evt-type=log-btn-pressed}}]}
 
        ;; List of results
       {:fx/type :scroll-pane
@@ -79,7 +80,8 @@
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
                   :text (result-map :mdl/link)
                   :on-action
-                  (fn [_] (dispatch! [:evt/link-clicked (result-map :mdl/link)]))}
+                  {::evt-type ::evt-type=link-clicked
+                   ::evt-arg (result-map :mdl/link)}}
                  {:fx/type :label
                   :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
                   :text (result-map :mdl/text)}]})
@@ -93,7 +95,6 @@
            acc ""]
       (letfn [(out-of-bounds? [string i]
                 (>= i (.length string)))
-              (next-index-fn [i] (inc i))
               (mult? [width i]
                 (and (not= 0 i)
                      (= 0 (mod i width))))
@@ -103,7 +104,7 @@
                      (if (mult? width i) "\n" "")))]
         (if (out-of-bounds? string i)
           acc
-          (recur (next-index-fn i)
+          (recur (inc i)
                  (next-acc-fn string width i acc)))))))
 
 (defn- path->uri [kb-path-str path-str]
@@ -147,80 +148,50 @@
         results (filter some? mdl-item-map)]
     (assoc state-map :mdl/results results)))
 
-(defn updatf [state-map event-key event-val]
+(defmulti upset ::evt-type)
 
-  (condp = event-key
+(defmethod upset ::evt-type=change-search-query
+  [{:keys [::runtime/coe-state fx/event]}]
+  (println "Search query changed:" event)
+  {::runtime/eff-state (assoc coe-state :mdl/search-text event)})
 
-    :evt/change-search-query
-    (let [new-state-hash (assoc state-map :mdl/search-text event-val)
-          new-effect-vec nil]
-      [new-state-hash new-effect-vec])
+(defmethod upset ::evt-type=redraw-btn-pressed
+  [{:keys [::runtime/coe-state]}]
+  {::runtime/eff-state coe-state})
 
-    :evt/redraw-btn-pressed
-    (let [new-state-hash state-map
-          new-effect-vec nil]
-      [new-state-hash new-effect-vec])
+(defmethod upset ::evt-type=clear-btn-pressed
+  [_arg]
+  {::runtime/eff-state init})
 
-    :evt/clear-btn-pressed
-    (let [new-state-hash init
-          new-effect-vec nil]
-      [new-state-hash new-effect-vec])
+(defmethod upset ::evt-type=search-btn-pressed
+  [{:keys [::runtime/coe-state]}]
+  {::eff-search [(coe-state :mdl/kb-path) (coe-state :mdl/search-text)]})
 
-    :evt/search-btn-pressed
-    (let [new-state-hash state-map
-          new-effect-vec
-          [:eff/search [(state-map :mdl/kb-path) (state-map :mdl/search-text)]]]
-      [new-state-hash new-effect-vec])
+(defmethod upset ::evt-type=search-output-received
+  [{:keys [::runtime/coe-state ::evt-arg]}]
+  (println "Event:" evt-arg)
+  {::runtime/eff-state
+   (new-state-on-search-output-received coe-state evt-arg)})
 
-    :evt/search-output-received
-    (let [new-state-hash
-          (new-state-on-search-output-received state-map event-val)]
-      [new-state-hash nil])
+(defmethod upset ::evt-type=log-btn-pressed
+  [{:keys [::runtime/coe-state]}]
+  {::runtime/eff-log coe-state})
 
-    :evt/log-btn-pressed
-    (let [new-state-hash state-map
-          new-effect-vec [:eff/log state-map]]
-      [new-state-hash new-effect-vec])
-
-    :evt/raise-requested
-    (let [new-state-hash state-map
-          new-effect-vec [:eff/raise-window]]
-      [new-state-hash new-effect-vec])
-
-    :evt/iconify-requested
-    (let [new-state-map (assoc state-map :mdl/iconified true)
-          new-effect-vec nil]
-      [new-state-map new-effect-vec])
-
-    :evt/deiconify-requested
-    (let [new-state-map (assoc state-map :mdl/iconified false)
-          new-effect-vec nil]
-      [new-state-map new-effect-vec])
-
-    :evt/link-clicked
-    (let [new-effect-vec [:eff/open-uri event-val]]
-      [state-map new-effect-vec])
-
-    (do (println "Unknown message key:" event-key)
-        [state-map nil])))
+(defmethod upset ::evt-type=link-clicked
+  [{:keys [::evt-arg]}]
+  {::eff-open-uri evt-arg})
 
 (defn- search-file! [[search-dir query] dispatch!]
+  (println (format "Searching into %s query %s" search-dir query))
   (future
     (let [result (shell/sh "rg" "--json" query search-dir)
-          output (result :out)]
-      (dispatch! [:evt/search-output-received output]))))
+          _ (println (format "Search result: %s" result))
+          output (result :out)
+          _ (println (format "Standard output: %s" output))]
+      (dispatch! {::evt-type ::evt-type=search-output-received ::evt-arg output}))))
 
-(defn- raise-window! [dispatch!]
-  (dispatch! [:evt/iconify-requested])
-  (future
-    (dispatch! [:evt/deiconify-requested])))
+(def effects
+  {::eff-search (fn [value dispatch!] (search-file! value dispatch!))
+   ::eff-open-uri (fn [value _dispatch!] (curi/open! value))})
 
-(defn effect! [[key value :as _new-effect-vec] dispatch!]
-  (condp = key
-    :eff/search (search-file! value dispatch!)
-    :eff/log (println "State:" value)
-    :eff/raise-window (raise-window! dispatch!)
-    :eff/open-uri (curi/open! value)
-    nil nil ; Ignore `nil` effect
-    (println "Effect not found:" key)))
-
+(def coeffects {})

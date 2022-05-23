@@ -1,30 +1,16 @@
 (ns clj-small-data.core
-  (:require [cljfx.api :as fx]
+  (:require [clj-small-data.runtime :as runtime]
             [clj-small-data.finder :as finder]))
 
-(def state-atom
-  (atom finder/init))
-
-(defn- dispatch! [[msg-key msg-val :as _message-vec]]
-  (fx/on-fx-thread
-   (let [update-result-vec (finder/updatf @state-atom msg-key msg-val)
-         [new-state-hash new-effect-vec] update-result-vec
-         get-new-state-hash (fn [_current-state-hash] new-state-hash)]
-     (swap! state-atom get-new-state-hash)
-     (finder/effect! new-effect-vec dispatch!))))
-
-(def renderer
-  (fx/create-renderer
-   :middleware
-   (fx/wrap-map-desc
-    (fn [state-val]
-      {:fx/type finder/view :state state-val :dispatch dispatch!}))))
+(def app
+  (runtime/create! finder/init
+                   (fn [] finder/view) ; Makes it possible to reload the fn
+                   finder/upset
+                   finder/coeffects
+                   finder/effects))
 
 (defn apply-changes! []
-  (dispatch! [:evt/raise-requested]))
+  (println "Applying changes")
+  (runtime/apply-changes! app))
 
-(defn -main []
-  (fx/mount-renderer state-atom renderer)
-  (apply-changes!))
-
-(-main)
+(apply-changes!)
