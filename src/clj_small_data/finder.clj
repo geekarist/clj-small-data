@@ -152,7 +152,6 @@
 
 (defmethod upset ::evt-type:change-search-query
   [{:keys [::runtime/coe-state fx/event]}]
-  (println "Search query changed:" event)
   {::runtime/eff:state (assoc coe-state ::mdl:search-text event)})
 
 (defmethod upset ::evt-type:redraw-btn-pressed
@@ -169,7 +168,6 @@
 
 (defmethod upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::evt-arg]}]
-  (println "Event:" evt-arg)
   {::runtime/eff:state
    (new-state-on-search-output-received coe-state evt-arg)})
 
@@ -182,12 +180,9 @@
   {::eff:open-uri evt-arg})
 
 (defn- search-file! [[search-dir query] dispatch!]
-  (println (format "Searching into %s query %s" search-dir query))
   (future
     (let [result (shell/sh "rg" "--json" query search-dir)
-          _ (println (format "Search result: %s" result))
-          output (result :out)
-          _ (println (format "Standard output: %s" output))]
+          output (result :out)]
       (dispatch! {::evt-type ::evt-type:search-output-received ::evt-arg output}))))
 
 (def effects
