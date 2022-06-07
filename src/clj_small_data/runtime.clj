@@ -1,5 +1,6 @@
 (ns clj-small-data.runtime
   (:require [cljfx.api :as fx]
+            [clojure.java.shell :as shell]
             [clojure.core.cache :as cache]))
 
 (defn- set-state! [context-atom state-map _dispatch!]
@@ -7,6 +8,18 @@
 
 (defn- log! [arg _dispatch!]
   (println arg))
+
+(defn- sh! [arg-map dispatch!]
+  (future
+    (let [tmpl-evt-map (arg-map ::eff:sh:tmpl-evt)
+          sh-cmd-vec (arg-map ::eff:sh:cmd)
+          _ (println "Command vector:" sh-cmd-vec)
+          cmd-out-map (apply shell/sh sh-cmd-vec)
+          _ (println "Command output:" cmd-out-map)
+          cmd-std-out-str (cmd-out-map :out)
+          evt-map (assoc tmpl-evt-map
+                         ::eff:sh:cmd-out cmd-std-out-str)]
+      (dispatch! evt-map))))
 
 (defn view-context [{:keys [fx/context]} view-fn]
   (let [state-map (fx/sub-val context identity)]
@@ -24,7 +37,8 @@
                    :effects
                    (assoc effects
                           ::eff:log #(log! %1 %2)
-                          ::eff:state #(set-state! context-atom %1 %2))
+                          ::eff:state #(set-state! context-atom %1 %2)
+                          ::eff:sh #(sh! %1 %2))
                    :desc-fn (fn [_]
                               {:fx/type #(view-context % (get-view-fn))}))))
 

@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [update])
   #_{:clj-kondo/ignore [:unused-namespace]}
   (:require
-   [clojure.java.shell :as shell]
    [clojure.string :as str]
    [clojure.data.json :as json]
    [taoensso.timbre :as timbre]
@@ -164,12 +163,19 @@
 
 (defmethod upset ::evt-type:search-btn-pressed
   [{:keys [::runtime/coe-state]}]
-  {::eff:search [(coe-state ::mdl:kb-path) (coe-state ::mdl:search-text)]})
+  (let [kb-path-str (coe-state ::mdl:kb-path)
+        query-str (coe-state ::mdl:search-text)
+        cmd-vec ["rg" "--json" query-str kb-path-str]
+        tmpl-evt-map {::evt-type ::evt-type:search-output-received}
+        eff-arg-map {::runtime/eff:sh:cmd cmd-vec
+                     ::runtime/eff:sh:tmpl-evt tmpl-evt-map}
+        upset-result-map {::runtime/eff:sh eff-arg-map}]
+    upset-result-map))
 
 (defmethod upset ::evt-type:search-output-received
-  [{:keys [::runtime/coe-state ::evt-arg]}]
+  [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
   {::runtime/eff:state
-   (new-state-on-search-output-received coe-state evt-arg)})
+   (new-state-on-search-output-received coe-state eff:sh:cmd-out)})
 
 (defmethod upset ::evt-type:log-btn-pressed
   [{:keys [::runtime/coe-state]}]
@@ -178,15 +184,7 @@
 (defmethod upset ::evt-type:link-clicked
   [{:keys [::evt-arg]}]
   {::eff:open-uri evt-arg})
-
-(defn- search-file! [[search-dir query] dispatch!]
-  (future
-    (let [result (shell/sh "rg" "--json" query search-dir)
-          output (result :out)]
-      (dispatch! {::evt-type ::evt-type:search-output-received ::evt-arg output}))))
-
 (def effects
-  {::eff:search (fn [value dispatch!] (search-file! value dispatch!))
-   ::eff:open-uri (fn [value _dispatch!] (curi/open! value))})
+  {::eff:open-uri (fn [value _dispatch!] (curi/open! value))})
 
 (def coeffects {})
