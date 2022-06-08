@@ -5,7 +5,6 @@
    [clojure.string :as str]
    [clojure.data.json :as json]
    [taoensso.timbre :as timbre]
-   [clj-uri.core :as curi]
    [clj-small-data.runtime :as runtime])
   (:import (java.io File)))
 
@@ -183,8 +182,4 @@
 
 (defmethod upset ::evt-type:link-clicked
   [{:keys [::evt-arg]}]
-  {::eff:open-uri evt-arg})
-(def effects
-  {::eff:open-uri (fn [value _dispatch!] (curi/open! value))})
-
-(def coeffects {})
+  {::runtime/eff:open-uri evt-arg})

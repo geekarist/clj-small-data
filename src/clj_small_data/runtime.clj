@@ -1,6 +1,7 @@
 (ns clj-small-data.runtime
   (:require [cljfx.api :as fx]
             [clojure.java.shell :as shell]
+            [clj-uri.core :as curi]
             [clojure.core.cache :as cache]))
 
 (defn- set-state! [context-atom state-map _dispatch!]
@@ -21,24 +22,27 @@
                          ::eff:sh:cmd-out cmd-std-out-str)]
       (dispatch! evt-map))))
 
+(defn effects [context-atom]
+  {::eff:log #(log! %1 %2)
+   ::eff:state #(set-state! context-atom %1 %2)
+   ::eff:sh #(sh! %1 %2)
+   ::eff:open-uri (fn [uri _dispatch!] (curi/open! uri))})
+
+(defn coeffects [context-atom]
+  {::coe-state #(fx/sub-val (deref context-atom) identity)})
+
 (defn view-context [{:keys [fx/context]} view-fn]
   (let [state-map (fx/sub-val context identity)]
     (view-fn state-map)))
 
-(defn create! [init get-view-fn upset coeffects effects]
+(defn create! [init get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory
         context (fx/create-context init cache-factory)
         context-atom (atom context)]
     (fx/create-app context-atom
                    :event-handler upset
-                   :co-effects
-                   (assoc coeffects
-                          ::coe-state #(fx/sub-val (deref context-atom) identity))
-                   :effects
-                   (assoc effects
-                          ::eff:log #(log! %1 %2)
-                          ::eff:state #(set-state! context-atom %1 %2)
-                          ::eff:sh #(sh! %1 %2))
+                   :co-effects (coeffects context-atom)
+                   :effects (effects context-atom)
                    :desc-fn (fn [_]
                               {:fx/type #(view-context % (get-view-fn))}))))
 
