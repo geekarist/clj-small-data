@@ -26,7 +26,8 @@
   {::eff:log #(log! %1 %2)
    ::eff:state #(set-state! context-atom %1 %2)
    ::eff:sh #(sh! %1 %2)
-   ::eff:open-uri (fn [uri _dispatch!] (curi/open! uri))})
+   ::eff:open-uri (fn [uri _dispatch!] (curi/open! uri))
+   ::eff:dispatch (fn [arg dispatch!] (dispatch! arg))})
 
 (defn coeffects [context-atom]
   {::coe-state #(fx/sub-val (deref context-atom) identity)})
@@ -34,6 +35,8 @@
 (defn view-context [{:keys [fx/context]} view-fn]
   (let [state-map (fx/sub-val context identity)]
     (view-fn state-map)))
+
+(defmulti upset ::evt-type)
 
 (defn create! [init get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory

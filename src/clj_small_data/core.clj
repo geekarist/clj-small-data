@@ -5,7 +5,7 @@
 (def app
   (runtime/create! finder/init
                    (fn [] finder/view) ; Makes it possible to reload the fn
-                   finder/upset))
+                   runtime/upset))
 
 (defn apply-changes! []
   (println "Applying changes")
