@@ -11,6 +11,16 @@
          ::mdl:search-field-placeholder "Please enter your search text"}
         results/init))
 
+(defn view-query [state-map]
+  [{:fx/type :text-field
+    :h-box/hgrow :always :text (state-map ::mdl:search-text)
+    :prompt-text (state-map ::mdl:search-field-placeholder)
+    :on-text-changed {::runtime/evt-type ::evt-type:change-search-query}}
+   {:fx/type :button :text "Clear" :h-box/margin {:left 8}
+    :on-action {::runtime/evt-type ::evt-type:clear-btn-pressed}}
+   {:fx/type :button :text "Find" :h-box/margin {:left 4}
+    :on-action {::runtime/evt-type ::evt-type:search-btn-pressed}}])
+
 (defn view [state-map]
 
   ;; Window
@@ -32,22 +42,15 @@
        :padding 16
        :children
 
-       [;; Query
-        {:fx/type :text-field
-         :h-box/hgrow :always :text (state-map ::mdl:search-text)
-         :prompt-text (state-map ::mdl:search-field-placeholder)
-         :on-text-changed {::runtime/evt-type ::evt-type:change-search-query}}
+       (conj
+        ;; Query
+        (view-query state-map)
 
-        ;; Buttons
-        {:fx/type :button :text "Clear" :h-box/margin {:left 8}
-         :on-action {::runtime/evt-type ::evt-type:clear-btn-pressed}}
-        {:fx/type :button :text "Find" :h-box/margin {:left 4}
-         :on-action {::runtime/evt-type ::evt-type:search-btn-pressed}}
-
+        ;; Global buttons
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
          :on-action {::runtime/evt-type ::evt-type:redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}}]}
+         :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}})}
 
       ;; List of results
       (results/view state-map))}}})
@@ -55,10 +58,6 @@
 (defmethod runtime/upset ::evt-type:change-search-query
   [{:keys [::runtime/coe-state fx/event]}]
   {::runtime/eff:state (assoc coe-state ::mdl:search-text event)})
-
-(defmethod runtime/upset ::evt-type:redraw-btn-pressed
-  [{:keys [::runtime/coe-state]}]
-  {::runtime/eff:state coe-state})
 
 (defmethod runtime/upset ::evt-type:clear-btn-pressed
   [_arg]
@@ -74,6 +73,10 @@
                      ::runtime/eff:sh:tmpl-evt tmpl-evt-map}
         upset-result-map {::runtime/eff:sh eff-arg-map}]
     upset-result-map))
+
+(defmethod runtime/upset ::evt-type:redraw-btn-pressed
+  [{:keys [::runtime/coe-state]}]
+  {::runtime/eff:state coe-state})
 
 (defmethod runtime/upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
