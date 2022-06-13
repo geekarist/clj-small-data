@@ -5,11 +5,13 @@
             [clj-small-data.query :as query]))
 
 (def init
-  (conj {::mdl:title "Small Data Finder"
-         ::mdl:iconified false
-         ::mdl:kb-path "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"}
-        (query/init {::runtime/evt-type ::evt-type:search-output-received})
-        results/init))
+  (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"]
+    (conj {::mdl:title "Small Data Finder"
+           ::mdl:iconified false
+           ::mdl:kb-path kb-path-str}
+          (query/init {::runtime/evt-type ::evt-type:search-output-received}
+                      kb-path-str)
+          results/init)))
 
 (defn view [state-map]
 
