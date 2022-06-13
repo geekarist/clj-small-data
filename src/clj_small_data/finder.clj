@@ -68,9 +68,9 @@
   (let [kb-path-str (coe-state ::mdl:kb-path)
         query-str (coe-state ::mdl:search-text)
         cmd-vec ["rg" "--json" query-str kb-path-str]
-        tmpl-evt-map {::runtime/evt-type ::evt-type:search-output-received}
+        got-output-event {::runtime/evt-type ::evt-type:search-output-received}
         eff-arg-map {::runtime/eff:sh:cmd cmd-vec
-                     ::runtime/eff:sh:tmpl-evt tmpl-evt-map}
+                     ::runtime/eff:sh:got-output got-output-event}
         upset-result-map {::runtime/eff:sh eff-arg-map}]
     upset-result-map))
 

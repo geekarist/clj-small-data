@@ -12,13 +12,13 @@
 
 (defn- sh! [arg-map dispatch!]
   (future
-    (let [tmpl-evt-map (arg-map ::eff:sh:tmpl-evt)
+    (let [got-output-evt (arg-map ::eff:sh:got-output)
           sh-cmd-vec (arg-map ::eff:sh:cmd)
           _ (println "Command vector:" sh-cmd-vec)
           cmd-out-map (apply shell/sh sh-cmd-vec)
           _ (println "Command output:" cmd-out-map)
           cmd-std-out-str (cmd-out-map :out)
-          evt-map (assoc tmpl-evt-map
+          evt-map (assoc got-output-evt
                          ::eff:sh:cmd-out cmd-std-out-str)]
       (dispatch! evt-map))))
 
