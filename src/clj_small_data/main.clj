@@ -1,4 +1,4 @@
-(ns clj-small-data.finder
+(ns clj-small-data.main
   (:refer-clojure :exclude [update])
   (:require [clj-small-data.results :as results]
             [clj-small-data.runtime :as runtime]))

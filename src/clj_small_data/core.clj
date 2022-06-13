@@ -1,10 +1,10 @@
 (ns clj-small-data.core
   (:require [clj-small-data.runtime :as runtime]
-            [clj-small-data.finder :as finder]))
+            [clj-small-data.main :as main]))
 
 (def app
-  (runtime/create! finder/init
-                   (fn [] finder/view) ; Makes it possible to reload the fn
+  (runtime/create! main/init
+                   (fn [] main/view) ; Makes it possible to reload the fn
                    runtime/upset))
 
 (defn apply-changes! []
