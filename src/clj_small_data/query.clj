@@ -5,10 +5,11 @@
   {::mdl:search-text ""
    ::mdl:search-field-placeholder "Please enter your search text"})
 
-(defn init [got-output on-reinit-requested kb-path-str]
+(defn init
+  [got-output got-reinit-request kb-path-str]
   (conj init-map
         {::mdl:got-output got-output
-         ::mdl:on-reinit-requested on-reinit-requested
+         ::mdl:on-reinit-requested got-reinit-request
          ::mdl:kb-path kb-path-str}))
 
 (defn view [state-map]

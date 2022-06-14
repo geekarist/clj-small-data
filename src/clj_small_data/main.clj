@@ -9,8 +9,8 @@
     (conj {::mdl:title "Small Data Finder"
            ::mdl:iconified false
            ::mdl:kb-path kb-path-str}
-          (query/init {::runtime/evt-type ::evt-type:search-output-received}
-                      {::runtime/evt-type ::evt-type:on-reinit-requested}
+          (query/init {::runtime/evt-type ::evt-type:got-search-output}
+                      {::runtime/evt-type ::evt-type:got-reinit-request}
                       kb-path-str)
           results/init)))
 
@@ -52,11 +52,11 @@
   [{:keys [::runtime/coe-state]}]
   {::runtime/eff:state coe-state})
 
-(defmethod runtime/upset ::evt-type:on-reinit-requested
+(defmethod runtime/upset ::evt-type:got-reinit-request
   [_arg]
   {::runtime/eff:state init})
 
-(defmethod runtime/upset ::evt-type:search-output-received
+(defmethod runtime/upset ::evt-type:got-search-output
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
   {::runtime/eff:dispatch
    {::runtime/evt-type ::results/evt-type:search-output-received
