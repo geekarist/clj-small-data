@@ -5,9 +5,10 @@
   {::mdl:search-text ""
    ::mdl:search-field-placeholder "Please enter your search text"})
 
-(defn init [got-output-event kb-path-str]
+(defn init [got-output on-reinit-requested kb-path-str]
   (conj init-map
-        {::mdl:got-output got-output-event
+        {::mdl:got-output got-output
+         ::mdl:on-reinit-requested on-reinit-requested
          ::mdl:kb-path kb-path-str}))
 
 (defn view [state-map]
@@ -26,7 +27,7 @@
 
 (defmethod runtime/upset ::evt-type:clear-btn-pressed
   [{:keys [::runtime/coe-state]}]
-  {::runtime/eff:state (conj coe-state init-map)})
+  {::runtime/eff:dispatch (coe-state ::mdl:on-reinit-requested)})
 
 (defmethod runtime/upset ::evt-type:search-btn-pressed
   [{:keys [::runtime/coe-state]}]

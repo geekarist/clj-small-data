@@ -10,6 +10,7 @@
            ::mdl:iconified false
            ::mdl:kb-path kb-path-str}
           (query/init {::runtime/evt-type ::evt-type:search-output-received}
+                      {::runtime/evt-type ::evt-type:on-reinit-requested}
                       kb-path-str)
           results/init)))
 
@@ -50,6 +51,10 @@
 (defmethod runtime/upset ::evt-type:redraw-btn-pressed
   [{:keys [::runtime/coe-state]}]
   {::runtime/eff:state coe-state})
+
+(defmethod runtime/upset ::evt-type:on-reinit-requested
+  [_arg]
+  {::runtime/eff:state init})
 
 (defmethod runtime/upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
