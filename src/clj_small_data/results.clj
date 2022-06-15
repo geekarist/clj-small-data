@@ -9,6 +9,7 @@
 
 (defn view [state-map]
   {:fx/type :scroll-pane
+   :fit-to-width true
    :content
 
    {:fx/type :v-box
