@@ -9,8 +9,17 @@
   - [X] ~~*Move effects to root ns*~~ [2022-06-08]
   - [X] ~~*Extract `results` module*~~ [2022-06-15]
   - [X] ~~*Extract `query` module*~~ [2022-06-15]
-- [ ] Improvements
-  - [ ] Let the user press Enter to submit a search
+- Improvements
   - [X] ~~*Match the width of components to the width of the window:*~~ [2022-06-15] 
-    Stage, scene, query/result box, results box, result item, result labels 
+  - [ ] Let the user press Enter to submit a search
   - [ ] Settings: knowledge base path
+  - [ ] Parse Markdown
+  - [ ] Overflow results?
+  - Word wrap
+    - [ ] Wrap results between words: https://en.wikipedia.org/wiki/Line_wrap_and_word_wrap
+    - [ ] Wrap results at window edge
+  - [ ] Only `.md` results
+  - [ ] Progress bar
+  - [ ] Improve margins and borders
+  - [ ] Tooltips on link hover
+  - [ ] Highlight the result in the text

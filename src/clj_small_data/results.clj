@@ -39,7 +39,7 @@
               :text (result-map ::mdl:text)}]})
          (state-map ::mdl:results))}})
 
-(defn- wrap-long-lines
+(defn- char-wrap
   "Take `string` and insert line endings every `width` characters."
   [string width]
   (when string
@@ -58,6 +58,22 @@
           acc
           (recur (inc i)
                  (next-acc-fn string width i acc)))))))
+
+(defn word-wrap
+  ([text width]
+   (let [_ (println "Split words...")
+         word-coll (str/split text #"\s")
+         _ (println (map #(format "'%s'" %) word-coll))
+         wrapped-str (word-wrap text width word-coll)]
+     wrapped-str))
+  ([text width word-coll]
+   (println "Word wrap: to do")))
+
+(comment
+  (word-wrap
+   (str "abc def ghi jkl\n"
+        "mno pqr stu vw\n")
+   5))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
@@ -78,13 +94,13 @@
         data-map (some-> json-deserialized :data)
         path-map (some-> data-map :path)
         path-str (some-> path-map :text)
-        path-wrapped-str (wrap-long-lines path-str 80)
+        path-wrapped-str (char-wrap path-str 80)
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
         text-str (some-> lines-map
                          :text
-                         (wrap-long-lines 80))]
+                         (char-wrap 80))]
     (when (= type-str "match")
       {::mdl:name name-str
        ::mdl:path path-wrapped-str
