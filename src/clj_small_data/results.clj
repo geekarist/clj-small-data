@@ -14,6 +14,7 @@
    :content
 
    {:fx/type :v-box
+    :padding {:top 16}
     :children
     (map (fn [result-map]
            {:fx/type :v-box
