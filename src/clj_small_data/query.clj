@@ -34,7 +34,7 @@
   [{:keys [::runtime/coe-state]}]
   (let [kb-path-str (coe-state ::mdl:kb-path)
         query-str (coe-state ::mdl:search-text)
-        cmd-vec ["rg" "--json" query-str kb-path-str]
+        cmd-vec ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
         got-output-event (coe-state ::mdl:got-output)
         eff-arg-map {::runtime/eff:sh:cmd cmd-vec
                      ::runtime/eff:sh:got-output got-output-event}
