@@ -1,7 +1,8 @@
 (ns clj-small-data.results
   (:require [clj-small-data.runtime :as runtime]
             [clojure.data.json :as json]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [cljfx.ext.web-view :as fx.ext.web-view])
   (:import (java.io File)))
 
 (def init
@@ -34,9 +35,16 @@
               :on-action
               {::runtime/evt-type ::evt-type:link-clicked
                ::evt-arg (result-map ::mdl:link)}}
-             {:fx/type :label
+             {:fx/type :v-box
               :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
-              :text (result-map ::mdl:text)}]})
+              :style {:-fx-border-color "#aaaaaa"
+                      :-fx-border-width 1}
+              :pref-height 100
+              :children
+              [{:fx/type fx.ext.web-view/with-engine-props
+                :desc {:fx/type :web-view}
+                :props {:content (result-map ::mdl:text)
+                        :java-script-enabled false}}]}]})
          (state-map ::mdl:results))}})
 
 (defn- char-wrap
@@ -58,22 +66,6 @@
           acc
           (recur (inc i)
                  (next-acc-fn string width i acc)))))))
-
-(defn word-wrap
-  ([text width]
-   (let [_ (println "Split words...")
-         word-coll (str/split text #"\s")
-         _ (println (map #(format "'%s'" %) word-coll))
-         wrapped-str (word-wrap text width word-coll)]
-     wrapped-str))
-  ([text width word-coll]
-   (println "Word wrap: to do")))
-
-(comment
-  (word-wrap
-   (str "abc def ghi jkl\n"
-        "mno pqr stu vw\n")
-   5))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
