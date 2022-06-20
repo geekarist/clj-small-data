@@ -14,12 +14,19 @@
   - [ ] Let the user press Enter to submit a search
   - [ ] Settings: knowledge base path
   - [ ] Parse Markdown
-  - [ ] Overflow results?
+    - [X] ~~*Simple parsing*~~ [2022-06-20]
+    - [ ] Wiki links/embeds to Markdown
+  - [ ] Fix WebView scrolling
+  - [X] ~~*Overflow results?*~~ [2022-06-20]
   - Word wrap
-    - [ ] Wrap results between words: https://en.wikipedia.org/wiki/Line_wrap_and_word_wrap
-    - [ ] Wrap results at window edge
-  - [ ] Only `.md` results
+    - [X] ~~*Wrap results between words: https://en.wikipedia.org/wiki/Line_wrap_and_word_wrap*~~ [2022-06-20]
+    - [X] ~~*Wrap results at window edge*~~ [2022-06-20]
+  - [X] ~~*Only `.md` results*~~ [2022-06-20]
   - [ ] Progress bar
   - [ ] Improve margins and borders
   - [ ] Tooltips on link hover
   - [ ] Highlight the result in the text
+
+VS Code shortcuts:
+- C-S-Enter: check/uncheck
+- C-S-C: toggle checkbox

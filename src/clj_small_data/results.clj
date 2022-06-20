@@ -2,7 +2,8 @@
   (:require [clj-small-data.runtime :as runtime]
             [clojure.data.json :as json]
             [clojure.string :as str]
-            [cljfx.ext.web-view :as fx.ext.web-view])
+            [cljfx.ext.web-view :as fx.ext.web-view]
+            [markdown.core :as mdc])
   (:import (java.io File)))
 
 (def init
@@ -71,13 +72,14 @@
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
-        text-str (some-> lines-map :text)]
+        md-str (some-> lines-map :text)
+        html-str (mdc/md-to-html-string md-str)]
     (when (= type-str "match")
       {::mdl:name name-str
        ::mdl:path path-wrapped-str
        ::mdl:link (path->uri kb-path-str path-str)
        ::mdl:line-number 123
-       ::mdl:text text-str})))
+       ::mdl:text html-str})))
 
 (defmethod runtime/upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out ::evt-arg:kb-path]}]

@@ -9,5 +9,6 @@
                  [org.clojure/data.json "2.4.1-SNAPSHOT"]
                  [cljs-ajax "0.8.4"]
                  [com.taoensso/timbre "5.2.1"]
-                 [com.profesorfalken/jPowerShell "3.1.1"]]
+                 [com.profesorfalken/jPowerShell "3.1.1"]
+                 [markdown-clj "1.11.1"]]
   :repl-options {:init-ns clj-small-data.core})
