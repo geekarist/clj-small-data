@@ -48,26 +48,6 @@
                         :java-script-enabled false}}]}]})
          (state-map ::mdl:results))}})
 
-(defn- char-wrap
-  "Take `string` and insert line endings every `width` characters."
-  [string width]
-  (when string
-    (loop [i 0
-           acc ""]
-      (letfn [(out-of-bounds? [string i]
-                (>= i (.length string)))
-              (mult? [width i]
-                (and (not= 0 i)
-                     (= 0 (mod i width))))
-              (next-acc-fn [string width i acc]
-                (str acc
-                     (nth string i)
-                     (if (mult? width i) "\n" "")))]
-        (if (out-of-bounds? string i)
-          acc
-          (recur (inc i)
-                 (next-acc-fn string width i acc)))))))
-
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
   ;; path-str: "c:\a\b\c-kb\ab cd.md"
@@ -87,13 +67,11 @@
         data-map (some-> json-deserialized :data)
         path-map (some-> data-map :path)
         path-str (some-> path-map :text)
-        path-wrapped-str (char-wrap path-str 80)
+        path-wrapped-str path-str
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
-        text-str (some-> lines-map
-                         :text
-                         (char-wrap 80))]
+        text-str (some-> lines-map :text)]
     (when (= type-str "match")
       {::mdl:name name-str
        ::mdl:path path-wrapped-str
