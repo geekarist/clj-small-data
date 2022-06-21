@@ -9,45 +9,51 @@
 (def init
   {::mdl:results []})
 
-(defn view [state-map]
-  {:fx/type :scroll-pane
-   :fit-to-width true
-   :content
+(defn view-result [result-map]
+  {:fx/type :v-box
+   :v-box/margin {:left 16
+                  :right 16
+                  :bottom 16}
+   :style {:-fx-border-color "#aaaaaa"
+           :-fx-border-width 1}
+   :children
+   [{:fx/type :label
+     :v-box/margin {:left 16 :right 16 :top 16 :bottom 4}
+     :text (result-map ::mdl:name)}
+    {:fx/type :label
+     :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
+     :text (result-map ::mdl:path)}
+    {:fx/type :hyperlink
+     :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
+     :text (result-map ::mdl:link)
+     :on-action
+     {::runtime/evt-type ::evt-type:link-clicked
+      ::evt-arg (result-map ::mdl:link)}}
+    {:fx/type :v-box
+     :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
+     :style {:-fx-border-color "#aaaaaa"
+             :-fx-border-width 1}
+     :pref-height 100
+     :children
+     [{:fx/type fx.ext.web-view/with-engine-props
+       :desc {:fx/type :web-view}
+       :props {:content (result-map ::mdl:text)
+               :java-script-enabled false}}]}]})
 
-   {:fx/type :v-box
-    :padding {:top 16}
-    :children
-    (map (fn [result-map]
-           {:fx/type :v-box
-            :v-box/margin {:left 16
-                           :right 16
-                           :bottom 16}
-            :style {:-fx-border-color "#aaaaaa"
-                    :-fx-border-width 1}
-            :children
-            [{:fx/type :label
-              :v-box/margin {:left 16 :right 16 :top 16 :bottom 4}
-              :text (result-map ::mdl:name)}
-             {:fx/type :label
-              :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-              :text (result-map ::mdl:path)}
-             {:fx/type :hyperlink
-              :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-              :text (result-map ::mdl:link)
-              :on-action
-              {::runtime/evt-type ::evt-type:link-clicked
-               ::evt-arg (result-map ::mdl:link)}}
-             {:fx/type :v-box
-              :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
-              :style {:-fx-border-color "#aaaaaa"
-                      :-fx-border-width 1}
-              :pref-height 100
-              :children
-              [{:fx/type fx.ext.web-view/with-engine-props
-                :desc {:fx/type :web-view}
-                :props {:content (result-map ::mdl:text)
-                        :java-script-enabled false}}]}]})
-         (state-map ::mdl:results))}})
+(defn view [state-map]
+  (let [results-coll (state-map ::mdl:results)]
+    (if (not-empty results-coll)
+      {:fx/type :scroll-pane
+       :fit-to-width true
+       :content {:fx/type :v-box
+                 :padding {:top 16}
+                 :children
+                 (map view-result results-coll)}}
+      {:fx/type :label
+       :style {:-fx-border-color ["#aaaaaa" "#00000000" "#00000000" "#00000000"]
+               :-fx-border-width 0.5}
+       :padding {:top 16 :bottom 16 :left 16 :right 16}
+       :text "No search results."})))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
