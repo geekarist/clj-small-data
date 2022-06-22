@@ -52,6 +52,7 @@
       {:fx/type :label
        :style {:-fx-border-color ["#aaaaaa" "#00000000" "#00000000" "#00000000"]
                :-fx-border-width 0.5}
+       :max-width Double/MAX_VALUE
        :padding {:top 16 :bottom 16 :left 16 :right 16}
        :text "No search results."})))
 

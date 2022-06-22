@@ -31,6 +31,7 @@
 
     ;; Vertical box
     {:fx/type :v-box
+     :fill-width true
      :children
      (vector
 
