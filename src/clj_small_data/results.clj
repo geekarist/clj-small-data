@@ -1,7 +1,8 @@
 (ns clj-small-data.results
   (:require [clj-small-data.runtime :as runtime]
             [clojure.data.json :as json]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [dev.core :refer [ggl!]])
   (:import (java.io File)))
 
 (def init
@@ -27,7 +28,9 @@
      :on-action
      {::runtime/evt-type ::evt-type:link-clicked
       ::evt-arg (result-map ::mdl:link)}}
-    {:fx/type :label
+    (comment
+      (ggl! "javafx how to constrain width of text to parent"))
+    {:fx/type :text
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
      :max-height 100
      :text (result-map ::mdl:text)}]})
