@@ -1,9 +1,7 @@
 (ns clj-small-data.results
   (:require [clj-small-data.runtime :as runtime]
             [clojure.data.json :as json]
-            [clojure.string :as str]
-            [cljfx.ext.web-view :as fx.ext.web-view]
-            [markdown.core :as mdc])
+            [clojure.string :as str])
   (:import (java.io File)))
 
 (def init
@@ -29,16 +27,10 @@
      :on-action
      {::runtime/evt-type ::evt-type:link-clicked
       ::evt-arg (result-map ::mdl:link)}}
-    {:fx/type :v-box
+    {:fx/type :label
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
-     :style {:-fx-border-color "#aaaaaa"
-             :-fx-border-width 1}
-     :pref-height 100
-     :children
-     [{:fx/type fx.ext.web-view/with-engine-props
-       :desc {:fx/type :web-view}
-       :props {:content (result-map ::mdl:text)
-               :java-script-enabled false}}]}]})
+     :max-height 100
+     :text (result-map ::mdl:text)}]})
 
 (defn view [state-map]
   (let [results-coll (state-map ::mdl:results)]
@@ -80,13 +72,13 @@
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
         md-str (some-> lines-map :text)
-        html-str (mdc/md-to-html-string md-str)]
+        #_{html-str (mdc/md-to-html-string md-str)}]
     (when (= type-str "match")
       {::mdl:name name-str
        ::mdl:path path-wrapped-str
        ::mdl:link (path->uri kb-path-str path-str)
        ::mdl:line-number 123
-       ::mdl:text html-str})))
+       ::mdl:text md-str})))
 
 (defmethod runtime/upset ::evt-type:search-output-received
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out ::evt-arg:kb-path]}]
