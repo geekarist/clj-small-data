@@ -7,7 +7,7 @@
 (def init
   {::mdl:results []})
 
-(defn view-result [result-map]
+(defn view-one-result [result-map]
   {:fx/type :v-box
    :v-box/margin {:left 16
                   :right 16
@@ -32,21 +32,27 @@
      :max-height 100
      :text (result-map ::mdl:text)}]})
 
+(defn view-some-results [results-coll]
+  {:fx/type :scroll-pane
+   :fit-to-width true
+   :content {:fx/type :v-box
+             :padding {:top 16}
+             :children
+             (map view-one-result results-coll)}})
+
+(defn view-empty-results []
+  {:fx/type :label
+   :style {:-fx-border-color ["#aaaaaa" "#00000000" "#00000000" "#00000000"]
+           :-fx-border-width 0.5}
+   :max-width Double/MAX_VALUE
+   :padding {:top 16 :bottom 16 :left 16 :right 16}
+   :text "No search results."})
+
 (defn view [state-map]
   (let [results-coll (state-map ::mdl:results)]
     (if (not-empty results-coll)
-      {:fx/type :scroll-pane
-       :fit-to-width true
-       :content {:fx/type :v-box
-                 :padding {:top 16}
-                 :children
-                 (map view-result results-coll)}}
-      {:fx/type :label
-       :style {:-fx-border-color ["#aaaaaa" "#00000000" "#00000000" "#00000000"]
-               :-fx-border-width 0.5}
-       :max-width Double/MAX_VALUE
-       :padding {:top 16 :bottom 16 :left 16 :right 16}
-       :text "No search results."})))
+      (view-some-results results-coll)
+      (view-empty-results))))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
