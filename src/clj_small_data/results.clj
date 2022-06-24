@@ -1,18 +1,12 @@
 (ns clj-small-data.results
   (:require [clj-small-data.runtime :as runtime]
-            [cljfx.api :as fx]
             [clojure.data.json :as json]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [dev.core :refer [ggl!]])
   (:import (java.io File)))
 
 (def init
   {::mdl:results []})
-
-(defn- text-set-up-wrap-to-parent [text-instance]
-  (println "Set up wrap to parent for text:" text-instance))
-
-(defn- text-tear-down-wrap-to-parent [text-instance]
-  (println "Tear down wrap to parent for text:" text-instance))
 
 (defn view-one-result [result-map]
   {:fx/type :v-box
@@ -34,14 +28,12 @@
      :on-action
      {::runtime/evt-type ::evt-type:link-clicked
       ::evt-arg (result-map ::mdl:link)}}
-    {:fx/type fx/ext-on-instance-lifecycle
+    (comment
+      (ggl! "javafx how to constrain width of text to parent"))
+    {:fx/type :text
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
      :max-height 100
-     :on-created text-set-up-wrap-to-parent
-     :on-deleted text-tear-down-wrap-to-parent
-     :desc
-     {:fx/type :text
-      :text (result-map ::mdl:text)}}]})
+     :text (result-map ::mdl:text)}]})
 
 (defn view-some-results [results-coll]
   {:fx/type :scroll-pane
