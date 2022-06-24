@@ -15,17 +15,17 @@
 - [X] ~~*Only `.md` results*~~ [2022-06-20]
 - [X] ~~*Match the width of components to the width of the window:*~~ [2022-06-15] 
 - [X] ~~*Overflow results?*~~ [2022-06-20]
-- [ ] Parse Markdown
+- [X] ~~*Parse Markdown*~~ [2022-06-24]
   - [X] ~~*Simple parsing*~~ [2022-06-20]
-  - [ ] Wiki links/embeds to Markdown
+  - [X] ~~*Wiki links/embeds to Markdown*~~ [2022-06-24]
 - [X] ~~*Empty view*~~ [2022-06-22]
+- [X] ~~*Open WebView links in external browser*~~ [2022-06-24]
+- [X] ~~*Fix WebView scrolling*~~ [2022-06-24]
+- [X] ~~*Improve margins and borders*~~ [2022-06-24]
 - [ ] Progress bar
 - [ ] Don't execute empty query
-- [ ] Open WebView links in external browser
 - [ ] Let the user press Enter to submit a search
 - [ ] Settings: knowledge base path
-- [ ] Fix WebView scrolling
-- [ ] Improve margins and borders
 - [ ] Tooltips on link hover
 - [ ] Highlight the result in the text
 

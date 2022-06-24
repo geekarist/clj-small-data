@@ -28,8 +28,13 @@
      {::runtime/evt-type ::evt-type:link-clicked
       ::evt-arg (result-map ::mdl:link)}}
     {:fx/type :label
+     :style {:-fx-border-color "#aaaaaa"
+             :-fx-border-width 1}
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 16}
+     :padding 8
      :max-height 100
+     :pref-width Double/MAX_VALUE
+     :wrap-text true
      :text (result-map ::mdl:text)}]})
 
 (defn view-some-results [results-coll]
@@ -77,7 +82,7 @@
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
-        md-str (some-> lines-map :text)
+        md-str (some-> lines-map :text str/trim)
         #_{html-str (mdc/md-to-html-string md-str)}]
     (when (= type-str "match")
       {::mdl:name name-str
