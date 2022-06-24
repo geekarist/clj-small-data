@@ -3,30 +3,16 @@
             [cljfx.api :as fx]
             [clojure.data.json :as json]
             [clojure.string :as str])
-  (:import (java.io File)
-           (javafx.scene Node)))
+  (:import (java.io File)))
 
 (def init
   {::mdl:results []})
 
-(defn- wrap-text-to-bounds [text-obj bounds-obj]
-  (let [new-width (.getWidth bounds-obj)]
-    (.setWrappingWidth text-obj new-width)))
+(defn- text-set-up-wrap-to-parent [text-instance]
+  (println "Set up wrap to parent for text:" text-instance))
 
-(defn- text-set-up-wrap-to-parent [text-obj]
-  (println "Set up wrap to parent for text:" text-obj)
-  (let [on-bounds-change (fn [bounds-obj] (wrap-text-to-bounds text-obj bounds-obj))
-        parent-obj (.getParent text-obj)
-        bounds-prop (.boundsInParentProperty parent-obj)]
-    (.addListener bounds-prop on-bounds-change)))
-
-(defn- text-tear-down-wrap-to-parent [text-obj]
-  (println "Tear down wrap to parent for text:" text-obj)
-  (let [;; Won't work:
-        on-bounds-change (fn [bounds-obj] (wrap-text-to-bounds text-obj bounds-obj))
-        parent-obj (.getParent text-obj)
-        bounds-prop (.boundsInParentProperty parent-obj)]
-    (.removeListener bounds-prop on-bounds-change)))
+(defn- text-tear-down-wrap-to-parent [text-instance]
+  (println "Tear down wrap to parent for text:" text-instance))
 
 (defn view-one-result [result-map]
   {:fx/type :v-box
