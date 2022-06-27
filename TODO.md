@@ -22,12 +22,17 @@
 - [X] ~~*Open WebView links in external browser*~~ [2022-06-24]
 - [X] ~~*Fix WebView scrolling*~~ [2022-06-24]
 - [X] ~~*Improve margins and borders*~~ [2022-06-24]
-- [ ] Progress bar
-- [ ] Don't execute empty query
+- [ ] Status bar
+- [ ] Optimize result formatting
+  - [ ] Format each result in a separate event handler call?
+  - [ ] Same but in batches of N results?
+  - [ ] Extract side effect?
+- [ ] Optimize view components execution (~recomposition)
 - [ ] Let the user press Enter to submit a search
-- [ ] Settings: knowledge base path
-- [ ] Tooltips on link hover
 - [ ] Highlight the result in the text
+- [ ] Don't execute empty query
+- [ ] 'Search in Obsidian' link on top of the results
+- [ ] Settings: knowledge base path
 
 VS Code shortcuts:
 - C-S-Enter: check/uncheck

@@ -7,7 +7,8 @@
 (defn init-main [kb-path-str]
   {::mdl:title "Small Data Finder"
    ::mdl:iconified false
-   ::mdl:kb-path kb-path-str})
+   ::mdl:kb-path kb-path-str
+   ::mdl:status "Idle"})
 
 (def init
   (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
@@ -38,6 +39,7 @@
       ;; Query field and buttons
       {:fx/type :h-box
        :padding 16
+       :alignment :center
        :children
 
        (conj
@@ -48,7 +50,10 @@
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
          :on-action {::runtime/evt-type ::evt-type:redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}})}
+         :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}}
+        {:fx/type :label :text (state-map ::mdl:status)
+         :alignment :center-right :h-box/margin {:left 8}
+         :pref-width 40 :max-width 40})}
 
       ;; List of results
       (results/view state-map))}}})
