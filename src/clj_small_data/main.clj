@@ -57,7 +57,7 @@
          :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}}
         {:fx/type :label :text (state-map ::mdl:status)
          :alignment :center-right :h-box/margin {:left 8}
-         :pref-width 40 :max-width 40})}
+         :pref-width 70 :max-width 70})}
 
       ;; List of results
       (results/view state-map))}}})
