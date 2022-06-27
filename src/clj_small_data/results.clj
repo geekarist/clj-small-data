@@ -4,8 +4,11 @@
             [clojure.string :as str])
   (:import (java.io File)))
 
-(def init
+(def init-map
   {::mdl:results []})
+
+(defn init [on-receive-results]
+  (assoc init-map ::mdl:on-receive-results on-receive-results))
 
 (defn view-one-result [result-map]
   {:fx/type :v-box
@@ -99,7 +102,8 @@
          result-coll (map (fn [json-str] (json->result kb-path-str json-str))
                           split-output-json-vec)
          non-nil-result-coll (filter some? result-coll)]
-     (assoc coe-state ::mdl:results non-nil-result-coll))})
+     (assoc coe-state ::mdl:results non-nil-result-coll))
+   ::runtime/eff:dispatch (coe-state ::mdl:on-receive-results)})
 
 (defmethod runtime/upset ::evt-type:link-clicked
   [{:keys [::evt-arg]}]

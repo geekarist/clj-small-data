@@ -14,9 +14,13 @@
   (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
         got-search-output {::runtime/evt-type ::evt-type:got-search-output}
         got-reinit-request {::runtime/evt-type ::evt-type:got-reinit-request}
+        on-send-query {::runtime/evt-type ::evt-type:on-status-changed
+                       ::evt-arg:new-status "Searching..."}
+        on-receive-results {::runtime/evt-type ::evt-type:on-status-changed
+                            ::evt-arg:new-status "Idle"}
         main-init-map (init-main kb-path-str)
-        query-init-map (query/init got-search-output got-reinit-request kb-path-str)
-        results-init-map results/init]
+        query-init-map (query/init got-search-output got-reinit-request kb-path-str on-send-query)
+        results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
 (defn view [state-map]
@@ -77,4 +81,6 @@
   [{:keys [::runtime/coe-state]}]
   {::runtime/eff:log coe-state})
 
-
+(defmethod  runtime/upset ::evt-type:on-status-changed
+  [{:keys [::evt-arg:new-status ::runtime/coe-state]}]
+  {::runtime/eff:state (assoc coe-state ::mdl:status evt-arg:new-status)})
