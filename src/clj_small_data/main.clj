@@ -12,14 +12,14 @@
 
 (def init
   (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
-        got-search-output {::runtime/evt-type ::evt-type:got-search-output}
-        got-reinit-request {::runtime/evt-type ::evt-type:got-reinit-request}
+        on-result-received {::runtime/evt-type ::evt-type:on-results-received}
+        on-reinit-request {::runtime/evt-type ::evt-type:on-reinit-request}
         on-send-query {::runtime/evt-type ::evt-type:on-status-changed
                        ::evt-arg:new-status "Searching..."}
         on-receive-results {::runtime/evt-type ::evt-type:on-status-changed
                             ::evt-arg:new-status "Idle"}
         main-init-map (init-main kb-path-str)
-        query-init-map (query/init got-search-output got-reinit-request kb-path-str on-send-query)
+        query-init-map (query/init on-result-received on-reinit-request kb-path-str on-send-query)
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
@@ -66,11 +66,11 @@
   [{:keys [::runtime/coe-state]}]
   {::runtime/eff:state coe-state})
 
-(defmethod runtime/upset ::evt-type:got-reinit-request
+(defmethod runtime/upset ::evt-type:on-reinit-request
   [_arg]
   {::runtime/eff:state init})
 
-(defmethod runtime/upset ::evt-type:got-search-output
+(defmethod runtime/upset ::evt-type:on-results-received
   [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
   {::runtime/eff:dispatch
    {::runtime/evt-type ::results/evt-type:search-output-received
