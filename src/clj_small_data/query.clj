@@ -6,12 +6,12 @@
    ::mdl:search-field-placeholder "Please enter your search text"})
 
 (defn init
-  [on-search-output-received on-reinit-request kb-path-str on-send-query]
+  [kb-path-str on-search-output-received on-reinit-request on-send-query]
   (conj init-map
-        {::on-search-output-received on-search-output-received
+        {::mdl:kb-path kb-path-str
+         ::mdl:on-send-query on-send-query
          ::mdl:on-reinit-request on-reinit-request
-         ::mdl:kb-path kb-path-str
-         ::mdl:on-send-query on-send-query}))
+         ::on-search-output-received on-search-output-received}))
 
 (defn view [state-map]
   [{:fx/type :text-field

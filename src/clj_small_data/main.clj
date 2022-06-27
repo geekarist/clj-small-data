@@ -19,7 +19,7 @@
         on-receive-results {::runtime/evt-type ::evt-type:on-status-changed
                             ::evt-arg:new-status "Idle"}
         main-init-map (init-main kb-path-str)
-        query-init-map (query/init on-result-received on-reinit-request kb-path-str on-send-query)
+        query-init-map (query/init kb-path-str on-result-received on-reinit-request on-send-query)
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
