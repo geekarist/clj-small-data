@@ -42,6 +42,7 @@
 
 (defn view-some-results [results-coll]
   {:fx/type :scroll-pane
+   :v-box/vgrow :always
    :fit-to-width true
    :content {:fx/type :v-box
              :padding {:top 16}
