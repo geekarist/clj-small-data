@@ -28,7 +28,7 @@
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
      :text (result-map ::mdl:link)
      :on-action
-     {::runtime/event-type ::event-type:link-clicked
+     {::runtime/event-type ::event-type|link-clicked
       ::evt-arg (result-map ::mdl:link)}}
     {:fx/type :label
      :style {:-fx-border-color "#aaaaaa"
@@ -95,10 +95,10 @@
        ::mdl:line-number 123
        ::mdl:text md-str})))
 
-(defmethod runtime/upset ::event-type:search-output-received
-  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out ::evt-arg:kb-path]}]
+(defmethod runtime/upset ::event-type|search-output-received
+  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out ::event-arg|kb-path]}]
   {::runtime/effect|state
-   (let [kb-path-str evt-arg:kb-path
+   (let [kb-path-str event-arg|kb-path
          split-output-json-vec (str/split effect|sh|cmd-out #"\n")
          result-coll (map (fn [json-str] (json->result kb-path-str json-str))
                           split-output-json-vec)
@@ -106,6 +106,6 @@
      (assoc coeffect|state ::mdl:results non-nil-result-coll))
    ::runtime/effect|dispatch (coeffect|state ::mdl:on-receive-results)})
 
-(defmethod runtime/upset ::event-type:link-clicked
+(defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::evt-arg]}]
   {::runtime/effect|open-uri evt-arg})
