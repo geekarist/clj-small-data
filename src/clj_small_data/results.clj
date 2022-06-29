@@ -5,10 +5,10 @@
   (:import (java.io File)))
 
 (def init-map
-  {::mdl:results []})
+  {::model|results []})
 
 (defn init [on-receive-results]
-  (assoc init-map ::mdl:on-receive-results on-receive-results))
+  (assoc init-map ::model|on-receive-results on-receive-results))
 
 (defn view-one-result [result-map]
   {:fx/type :v-box
@@ -20,16 +20,16 @@
    :children
    [{:fx/type :label
      :v-box/margin {:left 16 :right 16 :top 16 :bottom 4}
-     :text (result-map ::mdl:name)}
+     :text (result-map ::model|name)}
     {:fx/type :label
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-     :text (result-map ::mdl:path)}
+     :text (result-map ::model|path)}
     {:fx/type :hyperlink
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
-     :text (result-map ::mdl:link)
+     :text (result-map ::model|link)
      :on-action
      {::runtime/event-type ::event-type|link-clicked
-      ::evt-arg (result-map ::mdl:link)}}
+      ::evt-arg (result-map ::model|link)}}
     {:fx/type :label
      :style {:-fx-border-color "#aaaaaa"
              :-fx-border-width 1}
@@ -38,7 +38,7 @@
      :max-height 100
      :pref-width Double/MAX_VALUE
      :wrap-text true
-     :text (result-map ::mdl:text)}]})
+     :text (result-map ::model|text)}]})
 
 (defn view-some-results [results-coll]
   {:fx/type :scroll-pane
@@ -58,7 +58,7 @@
    :text "No search results."})
 
 (defn view [state-map]
-  (let [results-coll (state-map ::mdl:results)]
+  (let [results-coll (state-map ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)
       (view-empty-results))))
@@ -89,11 +89,11 @@
         md-str (some-> lines-map :text str/trim)
         #_{html-str (mdc/md-to-html-string md-str)}]
     (when (= type-str "match")
-      {::mdl:name name-str
-       ::mdl:path path-wrapped-str
-       ::mdl:link (path->uri kb-path-str path-str)
-       ::mdl:line-number 123
-       ::mdl:text md-str})))
+      {::model|name name-str
+       ::model|path path-wrapped-str
+       ::model|link (path->uri kb-path-str path-str)
+       ::model|line-number 123
+       ::model|text md-str})))
 
 (defmethod runtime/upset ::event-type|search-output-received
   [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out ::event-arg|kb-path]}]
@@ -103,8 +103,8 @@
          result-coll (map (fn [json-str] (json->result kb-path-str json-str))
                           split-output-json-vec)
          non-nil-result-coll (filter some? result-coll)]
-     (assoc coeffect|state ::mdl:results non-nil-result-coll))
-   ::runtime/effect|dispatch (coeffect|state ::mdl:on-receive-results)})
+     (assoc coeffect|state ::model|results non-nil-result-coll))
+   ::runtime/effect|dispatch (coeffect|state ::model|on-receive-results)})
 
 (defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::evt-arg]}]
