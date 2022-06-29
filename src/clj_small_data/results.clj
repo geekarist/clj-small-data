@@ -29,7 +29,7 @@
      :text (result-map ::model|link)
      :on-action
      {::runtime/event-type ::event-type|link-clicked
-      ::evt-arg (result-map ::model|link)}}
+      ::event-arg (result-map ::model|link)}}
     {:fx/type :label
      :style {:-fx-border-color "#aaaaaa"
              :-fx-border-width 1}
@@ -107,5 +107,5 @@
    ::runtime/effect|dispatch (coeffect|state ::model|on-receive-results)})
 
 (defmethod runtime/upset ::event-type|link-clicked
-  [{:keys [::evt-arg]}]
-  {::runtime/effect|open-uri evt-arg})
+  [{:keys [::event-arg]}]
+  {::runtime/effect|open-uri event-arg})
