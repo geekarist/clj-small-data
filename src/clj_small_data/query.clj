@@ -17,30 +17,30 @@
   [{:fx/type :text-field
     :h-box/hgrow :always :text (state-map ::mdl:search-text)
     :prompt-text (state-map ::mdl:search-field-placeholder)
-    :on-text-changed {::runtime/evt-type ::evt-type:change-search-query}}
+    :on-text-changed {::runtime/event-type ::event-type:change-search-query}}
    {:fx/type :button :text "Clear" :h-box/margin {:left 8}
-    :on-action {::runtime/evt-type ::evt-type:clear-btn-pressed}}
+    :on-action {::runtime/event-type ::event-type:clear-btn-pressed}}
    {:fx/type :button :text "Find" :h-box/margin {:left 4}
-    :on-action {::runtime/evt-type ::evt-type:search-btn-pressed}}])
+    :on-action {::runtime/event-type ::event-type:search-btn-pressed}}])
 
-(defmethod runtime/upset ::evt-type:change-search-query
-  [{:keys [::runtime/coe-state fx/event]}]
-  {::runtime/eff:state (assoc coe-state ::mdl:search-text event)})
+(defmethod runtime/upset ::event-type:change-search-query
+  [{:keys [::runtime/coeffect|state fx/event]}]
+  {::runtime/effect|state (assoc coeffect|state ::mdl:search-text event)})
 
-(defmethod runtime/upset ::evt-type:clear-btn-pressed
-  [{:keys [::runtime/coe-state]}]
-  {::runtime/eff:dispatch (coe-state ::mdl:on-reinit-request)})
+(defmethod runtime/upset ::event-type:clear-btn-pressed
+  [{:keys [::runtime/coeffect|state]}]
+  {::runtime/effect|dispatch (coeffect|state ::mdl:on-reinit-request)})
 
-(defmethod runtime/upset ::evt-type:search-btn-pressed
-  [{:keys [::runtime/coe-state]}]
-  (let [kb-path-str (coe-state ::mdl:kb-path)
-        query-str (coe-state ::mdl:search-text)
+(defmethod runtime/upset ::event-type:search-btn-pressed
+  [{:keys [::runtime/coeffect|state]}]
+  (let [kb-path-str (coeffect|state ::mdl:kb-path)
+        query-str (coeffect|state ::mdl:search-text)
         cmd-vec ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
-        got-output-event (coe-state ::on-search-output-received)
-        eff-arg-map {::runtime/eff:sh:cmd cmd-vec
-                     ::runtime/eff:sh:got-output got-output-event}
-        on-send-query (coe-state ::mdl:on-send-query)
-        upset-result-map {::runtime/eff:dispatch on-send-query
-                          ::runtime/eff:sh eff-arg-map}]
+        got-output-event (coeffect|state ::on-search-output-received)
+        eff-arg-map {::runtime/effect|sh|cmd cmd-vec
+                     ::runtime/effect|sh|on-command-output got-output-event}
+        on-send-query (coeffect|state ::mdl:on-send-query)
+        upset-result-map {::runtime/effect|dispatch on-send-query
+                          ::runtime/effect|sh eff-arg-map}]
     upset-result-map))
 

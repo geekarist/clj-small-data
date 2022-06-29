@@ -12,31 +12,31 @@
 
 (defn- sh! [arg-map dispatch!]
   (future
-    (let [sh-cmd-vec (arg-map ::eff:sh:cmd)
+    (let [sh-cmd-vec (arg-map ::effect|sh|cmd)
           _ (println "Command vector:" sh-cmd-vec)
           cmd-out-map (apply shell/sh sh-cmd-vec)
           _ (println "Command output:" cmd-out-map)
           cmd-std-out-str (cmd-out-map :out)
-          got-output-evt (arg-map ::eff:sh:got-output)
+          got-output-evt (arg-map ::effect|sh|on-command-output)
           evt-map (assoc got-output-evt
-                         ::eff:sh:cmd-out cmd-std-out-str)]
+                         ::effect|sh|cmd-out cmd-std-out-str)]
       (dispatch! evt-map))))
 
 (defn effects [context-atom]
-  {::eff:log #(log! %1 %2)
-   ::eff:state #(set-state! context-atom %1 %2)
-   ::eff:sh #(sh! %1 %2)
-   ::eff:open-uri (fn [uri _dispatch!] (curi/open! uri))
-   ::eff:dispatch (fn [arg dispatch!] (dispatch! arg))})
+  {::effect|log #(log! %1 %2)
+   ::effect|state #(set-state! context-atom %1 %2)
+   ::effect|sh #(sh! %1 %2)
+   ::effect|open-uri (fn [uri _dispatch!] (curi/open! uri))
+   ::effect|dispatch (fn [arg dispatch!] (dispatch! arg))})
 
 (defn coeffects [context-atom]
-  {::coe-state #(fx/sub-val (deref context-atom) identity)})
+  {::coeffect|state #(fx/sub-val (deref context-atom) identity)})
 
 (defn view-context [{:keys [fx/context]} view-fn]
   (let [state-map (fx/sub-val context identity)]
     (view-fn state-map)))
 
-(defmulti upset ::evt-type)
+(defmulti upset ::event-type)
 
 (defn create! [init get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory

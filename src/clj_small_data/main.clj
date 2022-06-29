@@ -12,11 +12,11 @@
 
 (def init
   (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
-        on-result-received {::runtime/evt-type ::evt-type:on-results-received}
-        on-reinit-request {::runtime/evt-type ::evt-type:on-reinit-request}
-        on-send-query {::runtime/evt-type ::evt-type:on-status-changed
+        on-result-received {::runtime/event-type ::event-type:on-results-received}
+        on-reinit-request {::runtime/event-type ::event-type:on-reinit-request}
+        on-send-query {::runtime/event-type ::event-type:on-status-changed
                        ::evt-arg:new-status "Searching..."}
-        on-receive-results {::runtime/evt-type ::evt-type:on-status-changed
+        on-receive-results {::runtime/event-type ::event-type:on-status-changed
                             ::evt-arg:new-status "Idle"}
         main-init-map (init-main kb-path-str)
         query-init-map (query/init kb-path-str on-result-received on-reinit-request on-send-query)
@@ -52,9 +52,9 @@
 
         ;; Global buttons
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action {::runtime/evt-type ::evt-type:redraw-btn-pressed}}
+         :on-action {::runtime/event-type ::event-type:redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action {::runtime/evt-type ::evt-type:log-btn-pressed}}
+         :on-action {::runtime/event-type ::event-type:log-btn-pressed}}
         {:fx/type :label :text (state-map ::mdl:status)
          :alignment :center-right :h-box/margin {:left 8}
          :pref-width 70 :max-width 70})}
@@ -62,25 +62,25 @@
       ;; List of results
       (results/view state-map))}}})
 
-(defmethod runtime/upset ::evt-type:redraw-btn-pressed
-  [{:keys [::runtime/coe-state]}]
-  {::runtime/eff:state coe-state})
+(defmethod runtime/upset ::event-type:redraw-btn-pressed
+  [{:keys [::runtime/coeffect|state]}]
+  {::runtime/effect|state coeffect|state})
 
-(defmethod runtime/upset ::evt-type:on-reinit-request
+(defmethod runtime/upset ::event-type:on-reinit-request
   [_arg]
-  {::runtime/eff:state init})
+  {::runtime/effect|state init})
 
-(defmethod runtime/upset ::evt-type:on-results-received
-  [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out]}]
-  {::runtime/eff:dispatch
-   {::runtime/evt-type ::results/evt-type:search-output-received
-    ::runtime/eff:sh:cmd-out eff:sh:cmd-out
-    ::results/evt-arg:kb-path (coe-state ::mdl:kb-path)}})
+(defmethod runtime/upset ::event-type:on-results-received
+  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out]}]
+  {::runtime/effect|dispatch
+   {::runtime/event-type ::results/event-type:search-output-received
+    ::runtime/effect|sh|cmd-out effect|sh|cmd-out
+    ::results/evt-arg:kb-path (coeffect|state ::mdl:kb-path)}})
 
-(defmethod runtime/upset ::evt-type:log-btn-pressed
-  [{:keys [::runtime/coe-state]}]
-  {::runtime/eff:log coe-state})
+(defmethod runtime/upset ::event-type:log-btn-pressed
+  [{:keys [::runtime/coeffect|state]}]
+  {::runtime/effect|log coeffect|state})
 
-(defmethod  runtime/upset ::evt-type:on-status-changed
-  [{:keys [::evt-arg:new-status ::runtime/coe-state]}]
-  {::runtime/eff:state (assoc coe-state ::mdl:status evt-arg:new-status)})
+(defmethod  runtime/upset ::event-type:on-status-changed
+  [{:keys [::evt-arg:new-status ::runtime/coeffect|state]}]
+  {::runtime/effect|state (assoc coeffect|state ::mdl:status evt-arg:new-status)})

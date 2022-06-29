@@ -22,7 +22,7 @@
 - [X] ~~*Open WebView links in external browser*~~ [2022-06-24]
 - [X] ~~*Fix WebView scrolling*~~ [2022-06-24]
 - [X] ~~*Improve margins and borders*~~ [2022-06-24]
-- [ ] Status bar
+- [X] ~~*Status bar*~~ [2022-06-28]
 - [ ] Optimize result formatting
   - [ ] Format each result in a separate event handler call?
   - [ ] Same but in batches of N results?

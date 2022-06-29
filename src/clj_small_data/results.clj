@@ -28,7 +28,7 @@
      :v-box/margin {:left 16 :right 16 :top 4 :bottom 4}
      :text (result-map ::mdl:link)
      :on-action
-     {::runtime/evt-type ::evt-type:link-clicked
+     {::runtime/event-type ::event-type:link-clicked
       ::evt-arg (result-map ::mdl:link)}}
     {:fx/type :label
      :style {:-fx-border-color "#aaaaaa"
@@ -95,17 +95,17 @@
        ::mdl:line-number 123
        ::mdl:text md-str})))
 
-(defmethod runtime/upset ::evt-type:search-output-received
-  [{:keys [::runtime/coe-state ::runtime/eff:sh:cmd-out ::evt-arg:kb-path]}]
-  {::runtime/eff:state
+(defmethod runtime/upset ::event-type:search-output-received
+  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out ::evt-arg:kb-path]}]
+  {::runtime/effect|state
    (let [kb-path-str evt-arg:kb-path
-         split-output-json-vec (str/split eff:sh:cmd-out #"\n")
+         split-output-json-vec (str/split effect|sh|cmd-out #"\n")
          result-coll (map (fn [json-str] (json->result kb-path-str json-str))
                           split-output-json-vec)
          non-nil-result-coll (filter some? result-coll)]
-     (assoc coe-state ::mdl:results non-nil-result-coll))
-   ::runtime/eff:dispatch (coe-state ::mdl:on-receive-results)})
+     (assoc coeffect|state ::mdl:results non-nil-result-coll))
+   ::runtime/effect|dispatch (coeffect|state ::mdl:on-receive-results)})
 
-(defmethod runtime/upset ::evt-type:link-clicked
+(defmethod runtime/upset ::event-type:link-clicked
   [{:keys [::evt-arg]}]
-  {::runtime/eff:open-uri evt-arg})
+  {::runtime/effect|open-uri evt-arg})
