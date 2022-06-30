@@ -73,14 +73,19 @@
 (defmethod runtime/upset ::event-type|on-results-received
   [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out]}]
   {::runtime/effect|dispatch
-   {::runtime/event-type ::results/event-type|search-output-received
-    ::runtime/effect|sh|cmd-out effect|sh|cmd-out
-    ::results/event-arg|kb-path (coeffect|state ::model|kb-path)}})
+   {::runtime/event-type ::event-type|on-status-changed
+    ::event-arg|new-status "Presenting..."
+    ::then-dispatch {::runtime/event-type ::results/event-type|search-output-received
+                     ::runtime/effect|sh|cmd-out effect|sh|cmd-out
+                     ::results/event-arg|kb-path (coeffect|state ::model|kb-path)}}})
 
 (defmethod runtime/upset ::event-type|log-btn-pressed
   [{:keys [::runtime/coeffect|state]}]
   {::runtime/effect|log coeffect|state})
 
 (defmethod  runtime/upset ::event-type|on-status-changed
-  [{:keys [::event-arg|new-status ::runtime/coeffect|state]}]
-  {::runtime/effect|state (assoc coeffect|state ::model|status event-arg|new-status)})
+  [{:keys [::event-arg|new-status ::runtime/coeffect|state ::then-dispatch]}]
+  (let [new-state-map (assoc coeffect|state ::model|status event-arg|new-status)
+        state-event-map {::runtime/effect|state new-state-map}
+        next-event-map (when then-dispatch {::runtime/effect|dispatch then-dispatch})]
+    (conj state-event-map next-event-map)))
