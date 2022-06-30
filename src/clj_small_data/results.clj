@@ -76,9 +76,8 @@
         uri (format uri-pattern vault-str file-encoded-fixed-str)]
     uri))
 
-(defn- json->result [kb-path-str json-str]
-  (let [json-deserialized (json/read-str json-str :key-fn keyword)
-        type-str (some-> json-deserialized :type)
+(defn- json-map->result [kb-path-str json-deserialized]
+  (let [type-str (some-> json-deserialized :type)
         data-map (some-> json-deserialized :data)
         path-map (some-> data-map :path)
         path-str (some-> path-map :text)
@@ -96,12 +95,29 @@
        ::model|text md-str})))
 
 (defmethod runtime/upset ::event-type|search-output-received
-  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out ::event-arg|kb-path]}]
+  [{:keys [::runtime/effect|sh|cmd-out ::event-arg|kb-path]}]
+  {::runtime/effect|dispatch
+   {::runtime/event-type ::event-type|search-output-trimmed
+    ::event-arg|trimmed-cmd-out (str/trim-newline effect|sh|cmd-out)
+    ::event-arg|kb-path event-arg|kb-path}})
+
+(defmethod runtime/upset ::event-type|search-output-trimmed
+  [{:keys [::event-arg|trimmed-cmd-out ::event-arg|kb-path]}]
+  {::runtime/effect|dispatch
+   {::runtime/event-type ::event-type|search-output-comma-separated
+    ::event-arg|comma-separated-cmd-out (str/replace event-arg|trimmed-cmd-out #"\n" ",")
+    ::event-arg|kb-path event-arg|kb-path}})
+
+(defmethod runtime/upset ::event-type|search-output-comma-separated
+  [{:keys [::runtime/coeffect|state ::event-arg|comma-separated-cmd-out ::event-arg|kb-path]}]
+
   {::runtime/effect|state
    (let [kb-path-str event-arg|kb-path
-         split-output-json-vec (str/split effect|sh|cmd-out #"\n")
-         result-coll (map (fn [json-str] (json->result kb-path-str json-str))
-                          split-output-json-vec)
+         comma-separated-cmd-out-str event-arg|comma-separated-cmd-out
+         output-json-str (str "[" comma-separated-cmd-out-str "]")
+         output-json-coll (json/read-str output-json-str :key-fn keyword)
+         result-coll (map (fn [json-map] (json-map->result kb-path-str json-map))
+                          output-json-coll)
          non-nil-result-coll (filter some? result-coll)]
      (assoc coeffect|state ::model|results non-nil-result-coll))
    ::runtime/effect|dispatch (coeffect|state ::model|on-receive-results)})
