@@ -109,13 +109,23 @@
     ::event-arg|kb-path event-arg|kb-path}})
 
 (defmethod runtime/upset ::event-type|search-output-comma-separated
-  [{:keys [::runtime/coeffect|state ::event-arg|comma-separated-cmd-out ::event-arg|kb-path]}]
+  [{:keys [::event-arg|comma-separated-cmd-out ::event-arg|kb-path]}]
+
+  (let [kb-path-str event-arg|kb-path
+        comma-separated-cmd-out-str event-arg|comma-separated-cmd-out
+        output-json-str (str "[" comma-separated-cmd-out-str "]")
+        output-json-coll (json/read-str output-json-str :key-fn keyword)]
+    {::runtime/effect|dispatch
+     {::runtime/event-type ::event-type|search-output-deserialized
+      ::event-arg|kb-path kb-path-str
+      ::event-arg|deserialized-search-output output-json-coll}}))
+
+(defmethod runtime/upset ::event-type|search-output-deserialized
+  [{:keys [::runtime/coeffect|state ::event-arg|deserialized-search-output ::event-arg|kb-path]}]
 
   {::runtime/effect|state
    (let [kb-path-str event-arg|kb-path
-         comma-separated-cmd-out-str event-arg|comma-separated-cmd-out
-         output-json-str (str "[" comma-separated-cmd-out-str "]")
-         output-json-coll (json/read-str output-json-str :key-fn keyword)
+         output-json-coll event-arg|deserialized-search-output
          result-coll (map (fn [json-map] (json-map->result kb-path-str json-map))
                           output-json-coll)
          non-nil-result-coll (filter some? result-coll)]
