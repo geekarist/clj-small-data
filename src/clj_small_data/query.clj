@@ -24,22 +24,23 @@
     :on-action {::runtime/event-type ::event-type|search-btn-pressed}}])
 
 (defmethod runtime/upset ::event-type|change-search-query
-  [{:keys [::runtime/coeffect|state fx/event]}]
-  {::runtime/effect|state (assoc coeffect|state ::model|search-text event)})
+  [{state-map ::runtime/coeffect|state
+    search-str :fx/event}]
+  {::runtime/effect|state (assoc state-map ::model|search-text search-str)})
 
 (defmethod runtime/upset ::event-type|clear-btn-pressed
-  [{:keys [::runtime/coeffect|state]}]
-  {::runtime/effect|dispatch (coeffect|state ::model|on-reinit-request)})
+  [{state-map ::runtime/coeffect|state}]
+  {::runtime/effect|dispatch (state-map ::model|on-reinit-request)})
 
 (defmethod runtime/upset ::event-type|search-btn-pressed
-  [{:keys [::runtime/coeffect|state]}]
-  (let [kb-path-str (coeffect|state ::model|kb-path)
-        query-str (coeffect|state ::model|search-text)
+  [{state-map ::runtime/coeffect|state}]
+  (let [kb-path-str (state-map ::model|kb-path)
+        query-str (state-map ::model|search-text)
         cmd-vec ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
-        got-output-event (coeffect|state ::model|on-search-output)
+        got-output-event (state-map ::model|on-search-output)
         eff-arg-map {::runtime/effect|sh|cmd cmd-vec
                      ::runtime/effect|sh|on-command-output got-output-event}
-        on-send-query (coeffect|state ::model|on-send-query)
+        on-send-query (state-map ::model|on-send-query)
         upset-result-map {::runtime/effect|dispatch on-send-query
                           ::runtime/effect|sh eff-arg-map}]
     upset-result-map))
