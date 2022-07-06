@@ -33,15 +33,13 @@
   {::runtime/effect|dispatch (state-map ::model|on-reinit-request)})
 
 (defmethod runtime/upset ::event-type|search-btn-pressed
-  [{state-map ::runtime/coeffect|state}]
-  (let [kb-path-str (state-map ::model|kb-path)
-        query-str (state-map ::model|search-text)
-        cmd-vec ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
-        got-output-event (state-map ::model|on-search-output)
-        eff-arg-map {::runtime/effect|sh|cmd cmd-vec
-                     ::runtime/effect|sh|on-command-output got-output-event}
-        on-send-query (state-map ::model|on-send-query)
-        upset-result-map {::runtime/effect|dispatch on-send-query
-                          ::runtime/effect|sh eff-arg-map}]
-    upset-result-map))
+  [{{kb-path-str ::model|kb-path
+     query-str ::model|search-text
+     on-search-output ::model|on-search-output
+     on-send-query ::model|on-send-query} ::runtime/coeffect|state}]
+
+  {::runtime/effect|dispatch on-send-query
+   ::runtime/effect|sh {::runtime/effect|sh|cmd
+                        ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
+                        ::runtime/effect|sh|on-command-output on-search-output}})
 

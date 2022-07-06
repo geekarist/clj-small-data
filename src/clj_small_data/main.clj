@@ -73,9 +73,11 @@
 (defmethod runtime/upset ::event-type|on-results-received
   [{state-map ::runtime/coeffect|state
     cmd-out-str ::runtime/effect|sh|cmd-out}]
+
   {::runtime/effect|dispatch
    {::runtime/event-type ::event-type|on-status-changed
     ::event-arg|new-status "Presenting..."
+
     ::then-dispatch {::runtime/event-type ::results/event-type|search-output-received
                      ::runtime/effect|sh|cmd-out cmd-out-str
                      ::results/event-arg|kb-path (state-map ::model|kb-path)}}})
@@ -84,10 +86,11 @@
   [{state-map ::runtime/coeffect|state}]
   {::runtime/effect|log state-map})
 
-(defmethod  runtime/upset ::event-type|on-status-changed
+(defmethod runtime/upset ::event-type|on-status-changed
   [{new-status-str ::event-arg|new-status
     state-map ::runtime/coeffect|state
     next-event-map ::then-dispatch}]
+
   (let [new-state-map (assoc state-map ::model|status new-status-str)
         state-effect-map {::runtime/effect|state new-state-map}
         next-event-effect-map (when next-event-map {::runtime/effect|dispatch next-event-map})]

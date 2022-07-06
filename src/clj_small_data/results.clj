@@ -97,6 +97,7 @@
 (defmethod runtime/upset ::event-type|search-output-received
   [{cmd-out-str ::runtime/effect|sh|cmd-out
     kb-path-str ::event-arg|kb-path}]
+
   {::runtime/effect|dispatch
    {::runtime/event-type ::event-type|search-output-trimmed
     ::event-arg|trimmed-cmd-out (str/trim-newline cmd-out-str)
