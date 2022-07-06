@@ -63,29 +63,32 @@
       (results/view state-map))}}})
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
-  [{:keys [::runtime/coeffect|state]}]
-  {::runtime/effect|state coeffect|state})
+  [{state-map ::runtime/coeffect|state}]
+  {::runtime/effect|state state-map})
 
 (defmethod runtime/upset ::event-type|on-reinit-request
   [_arg]
   {::runtime/effect|state init})
 
 (defmethod runtime/upset ::event-type|on-results-received
-  [{:keys [::runtime/coeffect|state ::runtime/effect|sh|cmd-out]}]
+  [{state-map ::runtime/coeffect|state
+    cmd-out-str ::runtime/effect|sh|cmd-out}]
   {::runtime/effect|dispatch
    {::runtime/event-type ::event-type|on-status-changed
     ::event-arg|new-status "Presenting..."
     ::then-dispatch {::runtime/event-type ::results/event-type|search-output-received
-                     ::runtime/effect|sh|cmd-out effect|sh|cmd-out
-                     ::results/event-arg|kb-path (coeffect|state ::model|kb-path)}}})
+                     ::runtime/effect|sh|cmd-out cmd-out-str
+                     ::results/event-arg|kb-path (state-map ::model|kb-path)}}})
 
 (defmethod runtime/upset ::event-type|log-btn-pressed
-  [{:keys [::runtime/coeffect|state]}]
-  {::runtime/effect|log coeffect|state})
+  [{state-map ::runtime/coeffect|state}]
+  {::runtime/effect|log state-map})
 
 (defmethod  runtime/upset ::event-type|on-status-changed
-  [{:keys [::event-arg|new-status ::runtime/coeffect|state ::then-dispatch]}]
-  (let [new-state-map (assoc coeffect|state ::model|status event-arg|new-status)
-        state-event-map {::runtime/effect|state new-state-map}
-        next-event-map (when then-dispatch {::runtime/effect|dispatch then-dispatch})]
-    (conj state-event-map next-event-map)))
+  [{new-status-str ::event-arg|new-status
+    state-map ::runtime/coeffect|state
+    next-event-map ::then-dispatch}]
+  (let [new-state-map (assoc state-map ::model|status new-status-str)
+        state-effect-map {::runtime/effect|state new-state-map}
+        next-event-effect-map (when next-event-map {::runtime/effect|dispatch next-event-map})]
+    (conj state-effect-map next-event-effect-map)))
