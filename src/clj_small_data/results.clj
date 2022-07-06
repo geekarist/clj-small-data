@@ -95,24 +95,27 @@
        ::model|text md-str})))
 
 (defmethod runtime/upset ::event-type|search-output-received
-  [{:keys [::runtime/effect|sh|cmd-out ::event-arg|kb-path]}]
+  [{cmd-out-str ::runtime/effect|sh|cmd-out
+    kb-path-str ::event-arg|kb-path}]
   {::runtime/effect|dispatch
    {::runtime/event-type ::event-type|search-output-trimmed
-    ::event-arg|trimmed-cmd-out (str/trim-newline effect|sh|cmd-out)
-    ::event-arg|kb-path event-arg|kb-path}})
+    ::event-arg|trimmed-cmd-out (str/trim-newline cmd-out-str)
+    ::event-arg|kb-path kb-path-str}})
 
 (defmethod runtime/upset ::event-type|search-output-trimmed
-  [{:keys [::event-arg|trimmed-cmd-out ::event-arg|kb-path]}]
+  [{trimmed-cmd-out-str ::event-arg|trimmed-cmd-out
+    kb-path-str ::event-arg|kb-path}]
   {::runtime/effect|dispatch
    {::runtime/event-type ::event-type|search-output-comma-separated
-    ::event-arg|comma-separated-cmd-out (str/replace event-arg|trimmed-cmd-out #"\n" ",")
-    ::event-arg|kb-path event-arg|kb-path}})
+    ::event-arg|comma-separated-cmd-out (str/replace trimmed-cmd-out-str #"\n" ",")
+    ::event-arg|kb-path kb-path-str}})
 
 (defmethod runtime/upset ::event-type|search-output-comma-separated
-  [{:keys [::event-arg|comma-separated-cmd-out ::event-arg|kb-path]}]
+  [{cmd-out-str ::event-arg|comma-separated-cmd-out
+    kb-path-str ::event-arg|kb-path}]
 
-  (let [kb-path-str event-arg|kb-path
-        comma-separated-cmd-out-str event-arg|comma-separated-cmd-out
+  (let [kb-path-str kb-path-str
+        comma-separated-cmd-out-str cmd-out-str
         output-json-str (str "[" comma-separated-cmd-out-str "]")
         output-json-coll (json/read-str output-json-str :key-fn keyword)]
     {::runtime/effect|dispatch
@@ -121,16 +124,16 @@
       ::event-arg|deserialized-search-output output-json-coll}}))
 
 (defmethod runtime/upset ::event-type|search-output-deserialized
-  [{:keys [::runtime/coeffect|state ::event-arg|deserialized-search-output ::event-arg|kb-path]}]
+  [{state-map ::runtime/coeffect|state
+    output-json-coll ::event-arg|deserialized-search-output
+    kb-path-str ::event-arg|kb-path}]
 
   {::runtime/effect|state
-   (let [kb-path-str event-arg|kb-path
-         output-json-coll event-arg|deserialized-search-output
-         result-coll (map (fn [json-map] (json-map->result kb-path-str json-map))
+   (let [result-coll (map (fn [json-map] (json-map->result kb-path-str json-map))
                           output-json-coll)
          non-nil-result-coll (filter some? result-coll)]
-     (assoc coeffect|state ::model|results non-nil-result-coll))
-   ::runtime/effect|dispatch (coeffect|state ::model|on-receive-results)})
+     (assoc state-map ::model|results non-nil-result-coll))
+   ::runtime/effect|dispatch (state-map ::model|on-receive-results)})
 
 (defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::event-arg]}]
