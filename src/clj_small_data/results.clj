@@ -125,16 +125,46 @@
       ::event-arg|deserialized-search-output output-json-coll}}))
 
 (defmethod runtime/upset ::event-type|search-output-deserialized
-  [{state-map ::runtime/coeffect|state
-    output-json-coll ::event-arg|deserialized-search-output
+  [{output-json-coll ::event-arg|deserialized-search-output
     kb-path-str ::event-arg|kb-path}]
 
+  (let [new-results-coll
+        (->> output-json-coll
+             (map (partial json-map->result kb-path-str))
+             (filter some?))
+        event-map
+        {::runtime/event-type ::event-type|results-received
+         ::event-arg|new-results new-results-coll}]
+    {::runtime/effect|dispatch event-map}))
+
+(defmethod runtime/upset ::event-type|results-received
+  [{state-map ::runtime/coeffect|state
+    new-results-coll ::event-arg|new-results}]
+
   {::runtime/effect|state
-   (let [result-coll (map (fn [json-map] (json-map->result kb-path-str json-map))
-                          output-json-coll)
-         non-nil-result-coll (filter some? result-coll)]
-     (assoc state-map ::model|results non-nil-result-coll))
-   ::runtime/effect|dispatch (state-map ::model|on-receive-results)})
+   (assoc state-map ::model|results [])
+
+   ::runtime/effect|dispatch
+   {::runtime/event-type ::event-type|additional-results-received
+    ::event-arg|additional-results new-results-coll}})
+
+(defmethod runtime/upset ::event-type|additional-results-received
+  [{{old-results-coll ::model|results
+     :as state-map} ::runtime/coeffect|state
+    additional-results-coll ::event-arg|additional-results}]
+
+  (if (not-empty additional-results-coll)
+
+    {::runtime/effect|state
+     (assoc state-map
+            ::model|results
+            (conj old-results-coll (first additional-results-coll)))
+
+     ::runtime/effect|dispatch
+     {::runtime/event-type ::event-type|additional-results-received
+      ::event-arg|additional-results (rest additional-results-coll)}}
+
+    {::runtime/effect|dispatch (state-map ::model|on-receive-results)}))
 
 (defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::event-arg]}]
