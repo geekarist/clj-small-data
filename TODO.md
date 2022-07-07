@@ -24,14 +24,19 @@
 - [X] ~~*Improve margins and borders*~~ [2022-06-24]
 - [X] ~~*Status bar*~~ [2022-06-28]
 - [ ] Optimize result formatting
-  - [ ] Format each result in a separate event handler call?
+  - [X] ~~*Format each result in a separate event handler call?*~~ [2022-07-07]s
+  - [X] ~~*Extract side effect?*~~ [2022-07-07]
   - [ ] Same but in batches of N results?
-  - [ ] Extract side effect?
+- [ ] Don't execute empty query
+- [ ] Prevent user interactions between during search
 - [ ] Optimize view components execution (~recomposition)
 - [ ] Let the user press Enter to submit a search
-- [ ] Highlight the result in the text
-- [ ] Don't execute empty query
 - [ ] 'Search in Obsidian' link on top of the results
+- [ ] Number of results on top
+- [ ] 'Search in progress' indicator
+- [ ] Remove status widget?
+- [ ] Highlight the result in the text
+- [ ] Paging results
 - [ ] Settings: knowledge base path
 
 VS Code shortcuts:

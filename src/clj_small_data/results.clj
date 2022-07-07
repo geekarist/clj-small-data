@@ -155,14 +155,15 @@
 
   (if (not-empty additional-results-coll)
 
-    {::runtime/effect|state
-     (assoc state-map
-            ::model|results
-            (conj old-results-coll (first additional-results-coll)))
+    (let [batch-size-num 10]
+      {::runtime/effect|state
+       (assoc state-map
+              ::model|results
+              (concat old-results-coll (take batch-size-num additional-results-coll)))
 
-     ::runtime/effect|dispatch
-     {::runtime/event-type ::event-type|additional-results-received
-      ::event-arg|additional-results (rest additional-results-coll)}}
+       ::runtime/effect|dispatch
+       {::runtime/event-type ::event-type|additional-results-received
+        ::event-arg|additional-results (drop batch-size-num additional-results-coll)}})
 
     {::runtime/effect|dispatch (state-map ::model|on-receive-results)}))
 
