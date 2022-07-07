@@ -40,6 +40,13 @@
      :wrap-text true
      :text (result-map ::model|text)}]})
 
+(defn- view-results-count [results-coll]
+  {:fx/type :label
+   :text-alignment :center
+   :padding {:bottom 16 :left 16 :right 16}
+   :max-width Double/MAX_VALUE
+   :text (format "Found %d results." (count results-coll))})
+
 (defn view-some-results [results-coll]
   {:fx/type :scroll-pane
    :v-box/vgrow :always
@@ -47,7 +54,8 @@
    :content {:fx/type :v-box
              :padding {:top 16}
              :children
-             (map view-one-result results-coll)}})
+             (concat [(view-results-count results-coll)]
+                     (map view-one-result results-coll))}})
 
 (defn view-empty-results []
   {:fx/type :label
