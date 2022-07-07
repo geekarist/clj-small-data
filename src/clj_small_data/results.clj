@@ -65,8 +65,8 @@
    :padding {:top 16 :bottom 16 :left 16 :right 16}
    :text "No search results."})
 
-(defn view [state-map]
-  (let [results-coll (state-map ::model|results)]
+(defn view [get-state]
+  (let [results-coll (get-state ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)
       (view-empty-results))))

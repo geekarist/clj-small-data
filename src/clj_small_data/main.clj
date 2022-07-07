@@ -1,8 +1,9 @@
 (ns clj-small-data.main
   (:refer-clojure :exclude [update])
-  (:require [clj-small-data.results :as results]
+  (:require [clj-small-data.query :as query]
+            [clj-small-data.results :as results]
             [clj-small-data.runtime :as runtime]
-            [clj-small-data.query :as query]))
+            [cljfx.api :as fx]))
 
 (defn init-main [kb-path-str]
   {::model|title "Small Data Finder"
@@ -23,44 +24,46 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn view [state-map]
+(defn view [{context-obj :fx/context}]
 
-  ;; Window
-  {:fx/type :stage :showing true :title (state-map ::model|title)
-   :iconified (state-map ::model|iconified)
-   :width 600 :height 600
+  (let [get-state #(fx/sub-val context-obj %)
+        state-map (fx/sub-val context-obj identity)]
+   ;; Window
+    {:fx/type :stage :showing true :title (get-state ::model|title)
+     :iconified (get-state ::model|iconified)
+     :width 600 :height 600
 
    ;; Main container
-   :scene
-   {:fx/type :scene :root
+     :scene
+     {:fx/type :scene :root
 
     ;; Vertical box
-    {:fx/type :v-box
-     :fill-width true
-     :children
-     (vector
+      {:fx/type :v-box
+       :fill-width true
+       :children
+       (vector
 
       ;; Query field and buttons
-      {:fx/type :h-box
-       :padding 16
-       :alignment :center
-       :children
+        {:fx/type :h-box
+         :padding 16
+         :alignment :center
+         :children
 
-       (conj
+         (conj
         ;; Query
-        (query/view state-map)
+          (query/view get-state)
 
         ;; Global buttons
-        {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-         :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
-        {:fx/type :button :text "Log" :h-box/margin {:left 4}
-         :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
-        {:fx/type :label :text (state-map ::model|status)
-         :alignment :center-right :h-box/margin {:left 8}
-         :pref-width 70 :max-width 70})}
+          {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
+           :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
+          {:fx/type :button :text "Log" :h-box/margin {:left 4}
+           :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
+          {:fx/type :label :text (get-state ::model|status)
+           :alignment :center-right :h-box/margin {:left 8}
+           :pref-width 70 :max-width 70})}
 
       ;; List of results
-      (results/view state-map))}}})
+        (results/view get-state))}}}))
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{state-map ::runtime/coeffect|state}]

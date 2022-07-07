@@ -32,10 +32,6 @@
 (defn coeffects [context-atom]
   {::coeffect|state #(fx/sub-val (deref context-atom) identity)})
 
-(defn view-context [{:keys [fx/context]} view-fn]
-  (let [state-map (fx/sub-val context identity)]
-    (view-fn state-map)))
-
 (defmulti upset ::event-type)
 
 (defn create! [init get-view-fn upset]
@@ -47,7 +43,7 @@
                    :co-effects (coeffects context-atom)
                    :effects (effects context-atom)
                    :desc-fn (fn [_]
-                              {:fx/type #(view-context % (get-view-fn))}))))
+                              {:fx/type (get-view-fn)}))))
 
 (defn apply-changes! [app]
   (let [renderer (app :renderer)]

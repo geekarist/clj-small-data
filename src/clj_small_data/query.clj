@@ -13,10 +13,10 @@
          ::model|on-reinit-request on-reinit-request
          ::model|on-search-output on-search-output-received}))
 
-(defn view [state-map]
+(defn view [get-state]
   [{:fx/type :text-field
-    :h-box/hgrow :always :text (state-map ::model|search-text)
-    :prompt-text (state-map ::model|search-field-placeholder)
+    :h-box/hgrow :always :text (get-state ::model|search-text)
+    :prompt-text (get-state ::model|search-field-placeholder)
     :on-text-changed {::runtime/event-type ::event-type|change-search-query}}
    {:fx/type :button :text "Clear" :h-box/margin {:left 8}
     :on-action {::runtime/event-type ::event-type|clear-btn-pressed}}
