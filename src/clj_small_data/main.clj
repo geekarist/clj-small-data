@@ -24,7 +24,7 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn- view [sub-state]
+(defn view [sub-state]
   {:fx/type :stage ; Window
    :showing true :title (sub-state ::model|title)
    :iconified (sub-state ::model|iconified)
@@ -59,10 +59,6 @@
 
       ;; List of results
       (results/view sub-state))}}})
-
-(defn view-ctx [{context-obj :fx/context}]
-  (let [get-state #(fx/sub-val context-obj %)]
-    (view get-state)))
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{state-map ::runtime/coeffect|state}]

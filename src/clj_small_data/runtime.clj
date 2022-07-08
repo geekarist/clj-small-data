@@ -48,3 +48,10 @@
 (defn apply-changes! [app]
   (let [renderer (app :renderer)]
     (renderer)))
+
+(defn view-ctx [view]
+  (fn  [{context-obj :fx/context}]
+    (let [get-state #(fx/sub-val context-obj %)]
+      (view get-state))))
+
+
