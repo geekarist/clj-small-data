@@ -24,46 +24,45 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn view [{context-obj :fx/context}]
+(defn- view [sub-state]
+  {:fx/type :stage ; Window
+   :showing true :title (sub-state ::model|title)
+   :iconified (sub-state ::model|iconified)
+   :width 600 :height 600
 
-  (let [get-state #(fx/sub-val context-obj %)
-        state-map (fx/sub-val context-obj identity)]
-   ;; Window
-    {:fx/type :stage :showing true :title (get-state ::model|title)
-     :iconified (get-state ::model|iconified)
-     :width 600 :height 600
+   :scene
+   {:fx/type :scene ; Main container
 
-   ;; Main container
-     :scene
-     {:fx/type :scene :root
+    :root
+    {:fx/type :v-box ; Vertical box
+     :fill-width true
+     :children
+     (vector
 
-    ;; Vertical box
-      {:fx/type :v-box
-       :fill-width true
+      {:fx/type :h-box ; Query field and buttons
+       :padding 16
+       :alignment :center
        :children
-       (vector
 
-      ;; Query field and buttons
-        {:fx/type :h-box
-         :padding 16
-         :alignment :center
-         :children
-
-         (conj
+       (conj
         ;; Query
-          (query/view get-state)
+        (query/view sub-state)
 
         ;; Global buttons
-          {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
-           :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
-          {:fx/type :button :text "Log" :h-box/margin {:left 4}
-           :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
-          {:fx/type :label :text (get-state ::model|status)
-           :alignment :center-right :h-box/margin {:left 8}
-           :pref-width 70 :max-width 70})}
+        {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
+         :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
+        {:fx/type :button :text "Log" :h-box/margin {:left 4}
+         :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
+        {:fx/type :label :text (sub-state ::model|status)
+         :alignment :center-right :h-box/margin {:left 8}
+         :pref-width 70 :max-width 70})}
 
       ;; List of results
-        (results/view get-state))}}}))
+      (results/view sub-state))}}})
+
+(defn view-ctx [{context-obj :fx/context}]
+  (let [get-state #(fx/sub-val context-obj %)]
+    (view get-state)))
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{state-map ::runtime/coeffect|state}]
