@@ -15,6 +15,7 @@
          ::model|on-search-output on-search-output-received}))
 
 (defn view [sub _desc]
+  (println "Executing query view")
   {:fx/type :h-box
    :children [{:fx/type :text-field
                :h-box/hgrow :always :text (sub ::model|search-text)

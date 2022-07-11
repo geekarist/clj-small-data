@@ -65,6 +65,7 @@
    :text "No search results."})
 
 (defn view [sub _desc]
+  (println "Executing results view")
   (let [results-coll (sub ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)

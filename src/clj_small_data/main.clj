@@ -24,6 +24,7 @@
     (conj main-init-map query-init-map results-init-map)))
 
 (defn view [sub desc]
+  (println "Executing main view")
   {:fx/type :stage ; Window
    :showing true :title (sub ::model|title)
    :iconified (sub ::model|iconified)
