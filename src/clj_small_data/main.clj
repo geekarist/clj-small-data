@@ -24,10 +24,10 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn view [sub-state]
+(defn view [sub]
   {:fx/type :stage ; Window
-   :showing true :title (sub-state ::model|title)
-   :iconified (sub-state ::model|iconified)
+   :showing true :title (sub ::model|title)
+   :iconified (sub ::model|iconified)
    :width 600 :height 600
 
    :scene
@@ -46,19 +46,19 @@
 
        (conj
         ;; Query
-        (query/view sub-state)
+        (query/view sub)
 
         ;; Global buttons
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
          :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
          :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
-        {:fx/type :label :text (sub-state ::model|status)
+        {:fx/type :label :text (sub ::model|status)
          :alignment :center-right :h-box/margin {:left 8}
          :pref-width 70 :max-width 70})}
 
       ;; List of results
-      (results/view sub-state))}}})
+      (results/view sub))}}})
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{state-map ::runtime/coeffect|state}]
