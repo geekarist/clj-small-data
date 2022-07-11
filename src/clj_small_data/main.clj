@@ -40,12 +40,13 @@
 
       {:fx/type :h-box ; Query field and buttons
        :padding 16
-       :alignment :center
+       :alignment :center-left
        :children
 
        (conj
         ;; Query
-        [{:fx/type (desc query/view)}]
+        [{:fx/type (desc query/view)
+          :h-box/hgrow :always}]
 
         ;; Global buttons
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
