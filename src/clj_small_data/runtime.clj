@@ -34,7 +34,12 @@
 
 (defmulti upset ::event-type)
 
-(defn create! [init get-view-fn upset]
+(defn- desc [view]
+  (fn [{context-obj :fx/context}]
+    (let [sub #(fx/sub-val context-obj %)]
+      (view sub))))
+
+(defn create! [init view upset]
   (let [cache-factory cache/lru-cache-factory
         context (fx/create-context init cache-factory)
         context-atom (atom context)]
@@ -43,7 +48,7 @@
                    :co-effects (coeffects context-atom)
                    :effects (effects context-atom)
                    :desc-fn (fn [_]
-                              {:fx/type (get-view-fn)}))))
+                              {:fx/type (desc view)}))))
 
 (defn apply-changes! [app]
   (let [renderer (app :renderer)]
