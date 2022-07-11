@@ -24,7 +24,7 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn view [sub]
+(defn view [sub desc]
   {:fx/type :stage ; Window
    :showing true :title (sub ::model|title)
    :iconified (sub ::model|iconified)
@@ -58,7 +58,8 @@
          :pref-width 70 :max-width 70})}
 
       ;; List of results
-      (results/view sub))}}})
+      {:fx/type (desc results/view)
+       :v-box/vgrow :always})}}})
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{state-map ::runtime/coeffect|state}]

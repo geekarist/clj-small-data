@@ -37,7 +37,7 @@
 (defn- desc [view]
   (fn [{context-obj :fx/context}]
     (let [sub #(fx/sub-val context-obj %)]
-      (view sub))))
+      (view sub desc))))
 
 (defn create! [init view upset]
   (let [cache-factory cache/lru-cache-factory

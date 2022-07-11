@@ -49,7 +49,6 @@
 
 (defn view-some-results [results-coll]
   {:fx/type :scroll-pane
-   :v-box/vgrow :always
    :fit-to-width true
    :content {:fx/type :v-box
              :padding {:top 16}
@@ -65,7 +64,7 @@
    :padding {:top 16 :bottom 16 :left 16 :right 16}
    :text "No search results."})
 
-(defn view [sub]
+(defn view [sub _desc]
   (let [results-coll (sub ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)
