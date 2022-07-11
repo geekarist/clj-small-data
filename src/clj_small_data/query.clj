@@ -1,5 +1,6 @@
 (ns clj-small-data.query
-  (:require [clj-small-data.runtime :as runtime]))
+  (:require [clj-small-data.runtime :as runtime]
+            [cljfx.api :as fx]))
 
 (def init-map
   {::model|search-text ""
@@ -13,15 +14,16 @@
          ::model|on-reinit-request on-reinit-request
          ::model|on-search-output on-search-output-received}))
 
-(defn view [sub]
-  [{:fx/type :text-field
-    :h-box/hgrow :always :text (sub ::model|search-text)
-    :prompt-text (sub ::model|search-field-placeholder)
-    :on-text-changed {::runtime/event-type ::event-type|change-search-query}}
-   {:fx/type :button :text "Clear" :h-box/margin {:left 8}
-    :on-action {::runtime/event-type ::event-type|clear-btn-pressed}}
-   {:fx/type :button :text "Find" :h-box/margin {:left 4}
-    :on-action {::runtime/event-type ::event-type|search-btn-pressed}}])
+(defn view [sub _desc]
+  {:fx/type :h-box
+   :children [{:fx/type :text-field
+               :h-box/hgrow :always :text (sub ::model|search-text)
+               :prompt-text (sub ::model|search-field-placeholder)
+               :on-text-changed {::runtime/event-type ::event-type|change-search-query}}
+              {:fx/type :button :text "Clear" :h-box/margin {:left 8}
+               :on-action {::runtime/event-type ::event-type|clear-btn-pressed}}
+              {:fx/type :button :text "Find" :h-box/margin {:left 4}
+               :on-action {::runtime/event-type ::event-type|search-btn-pressed}}]})
 
 (defmethod runtime/upset ::event-type|change-search-query
   [{state-map ::runtime/coeffect|state

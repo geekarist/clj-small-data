@@ -2,8 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clj-small-data.query :as query]
             [clj-small-data.results :as results]
-            [clj-small-data.runtime :as runtime]
-            [cljfx.api :as fx]))
+            [clj-small-data.runtime :as runtime]))
 
 (defn init-main [kb-path-str]
   {::model|title "Small Data Finder"
@@ -46,7 +45,7 @@
 
        (conj
         ;; Query
-        (query/view sub)
+        [{:fx/type (desc query/view)}]
 
         ;; Global buttons
         {:fx/type :button :text "Redraw" :h-box/margin {:left 8}
