@@ -39,7 +39,7 @@
     (let [sub #(fx/sub-val context-obj %)]
       (view sub desc))))
 
-(defn create! [init view upset]
+(defn create! [init get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory
         context (fx/create-context init cache-factory)
         context-atom (atom context)]
@@ -48,7 +48,7 @@
                    :co-effects (coeffects context-atom)
                    :effects (effects context-atom)
                    :desc-fn (fn [_]
-                              {:fx/type (desc view)}))))
+                              {:fx/type (desc (get-view-fn))}))))
 
 (defn apply-changes! [app]
   (let [renderer (app :renderer)]

@@ -4,7 +4,7 @@
 
 (def app
   (runtime/create! main/init
-                   main/view ; TODO: Make it possible to reload the fn
+                   (fn [] main/view) ; Make it possible to reload the fn
                    runtime/upset))
 
 (defn apply-changes! []
