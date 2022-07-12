@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [update])
   (:require [clj-small-data.query :as query]
             [clj-small-data.results :as results]
-            [clj-small-data.runtime :as runtime]))
+            [clj-small-data.runtime :as runtime]
+            [cljfx.api :as fx]))
 
 (defn init-main [kb-path-str]
   {::model|title "Small Data Finder"
@@ -23,11 +24,11 @@
         results-init-map (results/init on-receive-results)]
     (conj main-init-map query-init-map results-init-map)))
 
-(defn view [sub desc]
+(defn view [{context :fx/context}]
   (println "Executing main view")
   {:fx/type :stage ; Window
-   :showing true :title (sub ::model|title)
-   :iconified (sub ::model|iconified)
+   :showing true :title (fx/sub-val context ::model|title)
+   :iconified (fx/sub-val context ::model|iconified)
    :width 600 :height 600
 
    :scene
@@ -46,7 +47,7 @@
 
        (conj
         ;; Query
-        [{:fx/type (desc query/view)
+        [{:fx/type query/view
           :h-box/hgrow :always}]
 
         ;; Global buttons
@@ -54,12 +55,12 @@
          :on-action {::runtime/event-type ::event-type|redraw-btn-pressed}}
         {:fx/type :button :text "Log" :h-box/margin {:left 4}
          :on-action {::runtime/event-type ::event-type|log-btn-pressed}}
-        {:fx/type :label :text (sub ::model|status)
+        {:fx/type :label :text (fx/sub-val context ::model|status)
          :alignment :center-right :h-box/margin {:left 8}
          :pref-width 70 :max-width 70})}
 
       ;; List of results
-      {:fx/type (desc results/view)
+      {:fx/type results/view
        :v-box/vgrow :always})}}})
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed

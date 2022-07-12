@@ -14,12 +14,12 @@
          ::model|on-reinit-request on-reinit-request
          ::model|on-search-output on-search-output-received}))
 
-(defn view [sub _desc]
+(defn view [{context :fx/context}]
   (println "Executing query view")
   {:fx/type :h-box
    :children [{:fx/type :text-field
-               :h-box/hgrow :always :text (sub ::model|search-text)
-               :prompt-text (sub ::model|search-field-placeholder)
+               :h-box/hgrow :always :text (fx/sub-val context ::model|search-text)
+               :prompt-text (fx/sub-val context ::model|search-field-placeholder)
                :on-text-changed {::runtime/event-type ::event-type|change-search-query}}
               {:fx/type :button :text "Clear" :h-box/margin {:left 8}
                :on-action {::runtime/event-type ::event-type|clear-btn-pressed}}

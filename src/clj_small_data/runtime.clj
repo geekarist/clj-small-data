@@ -48,7 +48,7 @@
                    :co-effects (coeffects context-atom)
                    :effects (effects context-atom)
                    :desc-fn (fn [_]
-                              {:fx/type (desc (get-view-fn))}))))
+                              {:fx/type (get-view-fn)}))))
 
 (defn apply-changes! [app]
   (let [renderer (app :renderer)]

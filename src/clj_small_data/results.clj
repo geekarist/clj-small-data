@@ -1,5 +1,6 @@
 (ns clj-small-data.results
   (:require [clj-small-data.runtime :as runtime]
+            [cljfx.api :as fx]
             [clojure.data.json :as json]
             [clojure.string :as str])
   (:import (java.io File)))
@@ -64,9 +65,9 @@
    :padding {:top 16 :bottom 16 :left 16 :right 16}
    :text "No search results."})
 
-(defn view [sub _desc]
+(defn view [{context :fx/context}]
   (println "Executing results view")
-  (let [results-coll (sub ::model|results)]
+  (let [results-coll (fx/sub-val context ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)
       (view-empty-results))))
