@@ -15,7 +15,7 @@
     (let [sh-cmd-vec (arg-map ::effect|sh|cmd)
           _ (println "Command vector:" sh-cmd-vec)
           cmd-out-map (apply shell/sh sh-cmd-vec)
-          _ (println "Command output:" cmd-out-map)
+          ;; _ (println "Command output:" cmd-out-map)
           cmd-std-out-str (cmd-out-map :out)
           got-output-evt (arg-map ::effect|sh|on-command-output)
           evt-map (assoc got-output-evt

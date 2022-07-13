@@ -27,13 +27,13 @@
                :on-action {::runtime/event-type ::event-type|search-btn-pressed}}]})
 
 (defmethod runtime/upset ::event-type|change-search-query
-  [{state-map ::runtime/coeffect|state
-    search-str :fx/event}]
-  {::runtime/effect|state (assoc state-map ::model|search-text search-str)})
+  [{search-str :fx/event
+    context :fx/context}]
+  {:context (fx/swap-context context assoc ::model|search-text search-str)})
 
 (defmethod runtime/upset ::event-type|clear-btn-pressed
-  [{state-map ::runtime/coeffect|state}]
-  {::runtime/effect|dispatch (state-map ::model|on-reinit-request)})
+  [{context :fx/context}]
+  {::runtime/effect|dispatch (fx/sub-val context ::model|on-reinit-request)})
 
 (defmethod runtime/upset ::event-type|search-btn-pressed
   [{{kb-path-str ::model|kb-path
