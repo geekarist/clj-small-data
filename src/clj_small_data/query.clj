@@ -36,13 +36,15 @@
   {::runtime/effect|dispatch (fx/sub-val context ::model|on-reinit-request)})
 
 (defmethod runtime/upset ::event-type|search-btn-pressed
-  [{{kb-path-str ::model|kb-path
-     query-str ::model|search-text
-     on-search-output ::model|on-search-output
-     on-send-query ::model|on-send-query} ::runtime/coeffect|state}]
+  [{context :fx/context}]
 
-  {::runtime/effect|dispatch on-send-query
-   ::runtime/effect|sh {::runtime/effect|sh|cmd
-                        ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
-                        ::runtime/effect|sh|on-command-output on-search-output}})
+  (let [kb-path-str (fx/sub-val context ::model|kb-path)
+        query-str (fx/sub-val context ::model|search-text)
+        on-search-output (fx/sub-val context ::model|on-search-output)
+        on-send-query (fx/sub-val context ::model|on-send-query)]
+
+    {::runtime/effect|dispatch on-send-query
+     ::runtime/effect|sh {::runtime/effect|sh|cmd
+                          ["rg" "--json" "--glob" "**/*.md" query-str kb-path-str]
+                          ::runtime/effect|sh|on-command-output on-search-output}}))
 
