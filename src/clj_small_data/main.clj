@@ -68,7 +68,7 @@
   {:context context})
 
 (defmethod runtime/upset ::event-type|on-reinit-request
-  [{context :context}]
+  [{context :fx/context}]
   {:context (fx/reset-context context init)})
 
 (defmethod runtime/upset ::event-type|on-results-received
