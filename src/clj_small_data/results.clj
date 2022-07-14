@@ -147,34 +147,35 @@
     {::runtime/effect|dispatch event-map}))
 
 (defmethod runtime/upset ::event-type|results-received
-  [{state-map ::runtime/coeffect|state
-    new-results-coll ::event-arg|new-results}]
+  [{new-results-coll ::event-arg|new-results
+    context :fx/context}]
 
-  {::runtime/effect|state
-   (assoc state-map ::model|results [])
+  {:context
+   (fx/swap-context context assoc ::model|results [])
 
    ::runtime/effect|dispatch
    {::runtime/event-type ::event-type|additional-results-received
     ::event-arg|additional-results new-results-coll}})
 
 (defmethod runtime/upset ::event-type|additional-results-received
-  [{{old-results-coll ::model|results
-     :as state-map} ::runtime/coeffect|state
+  [{context :fx/context
     additional-results-coll ::event-arg|additional-results}]
 
   (if (not-empty additional-results-coll)
 
-    (let [batch-size-num 10]
-      {::runtime/effect|state
-       (assoc state-map
-              ::model|results
-              (concat old-results-coll (take batch-size-num additional-results-coll)))
+    (let [batch-size-num 100
+          old-results-coll (fx/sub-val context ::model|results)]
+
+      {:context
+       (fx/swap-context context assoc ::model|results
+                        (concat old-results-coll (take batch-size-num additional-results-coll)))
+
 
        ::runtime/effect|dispatch
        {::runtime/event-type ::event-type|additional-results-received
         ::event-arg|additional-results (drop batch-size-num additional-results-coll)}})
 
-    {::runtime/effect|dispatch (state-map ::model|on-receive-results)}))
+    {::runtime/effect|dispatch (fx/sub-val context ::model|on-receive-results)}))
 
 (defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::event-arg]}]
