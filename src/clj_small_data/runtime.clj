@@ -4,9 +4,6 @@
             [clj-uri.core :as curi]
             [clojure.core.cache :as cache]))
 
-(defn- set-state! [context-atom state-map _dispatch!]
-  (swap! context-atom fx/reset-context state-map))
-
 (defn- log! [arg _dispatch!]
   (println arg))
 
@@ -22,22 +19,16 @@
                          ::effect|sh|cmd-out cmd-std-out-str)]
       (dispatch! evt-map))))
 
-(defn effects [context-atom]
+(defn effects [_context-atom]
   {::effect|log #(log! %1 %2)
-   ::effect|state #(set-state! context-atom %1 %2)
    ::effect|sh #(sh! %1 %2)
    ::effect|open-uri (fn [uri _dispatch!] (curi/open! uri))
    ::effect|dispatch (fn [arg dispatch!] (dispatch! arg))})
 
-(defn coeffects [context-atom]
-  {::coeffect|state #(fx/sub-val (deref context-atom) identity)})
+(defn coeffects [_context-atom]
+  {})
 
 (defmulti upset ::event-type)
-
-(defn- desc [view]
-  (fn [{context-obj :fx/context}]
-    (let [sub #(fx/sub-val context-obj %)]
-      (view sub desc))))
 
 (defn create! [init get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory

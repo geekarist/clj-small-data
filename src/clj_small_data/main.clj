@@ -64,15 +64,15 @@
        :v-box/vgrow :always})}}})
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
-  [{state-map ::runtime/coeffect|state}]
-  {::runtime/effect|state state-map})
+  [{context :fx/context}]
+  {:context context})
 
 (defmethod runtime/upset ::event-type|on-reinit-request
-  [_arg]
-  {::runtime/effect|state init})
+  [{context :context}]
+  {:context (fx/reset-context context init)})
 
 (defmethod runtime/upset ::event-type|on-results-received
-  [{state-map ::runtime/coeffect|state
+  [{context :fx/context
     cmd-out-str ::runtime/effect|sh|cmd-out}]
 
   {::runtime/effect|dispatch
@@ -81,18 +81,18 @@
 
     ::then-dispatch {::runtime/event-type ::results/event-type|search-output-received
                      ::runtime/effect|sh|cmd-out cmd-out-str
-                     ::results/event-arg|kb-path (state-map ::model|kb-path)}}})
+                     ::results/event-arg|kb-path (fx/sub-val context ::model|kb-path)}}})
 
 (defmethod runtime/upset ::event-type|log-btn-pressed
-  [{state-map ::runtime/coeffect|state}]
-  {::runtime/effect|log state-map})
+  [{context :fx/context}]
+  {::runtime/effect|log (fx/sub-val context identity)})
 
 (defmethod runtime/upset ::event-type|on-status-changed
   [{new-status-str ::event-arg|new-status
-    state-map ::runtime/coeffect|state
+    context :fx/context
     next-event-map ::then-dispatch}]
 
-  (let [new-state-map (assoc state-map ::model|status new-status-str)
-        state-effect-map {::runtime/effect|state new-state-map}
+  (let [new-context (fx/swap-context context assoc ::model|status new-status-str)
+        state-effect-map {:context new-context}
         next-event-effect-map (when next-event-map {::runtime/effect|dispatch next-event-map})]
     (conj state-effect-map next-event-effect-map)))
