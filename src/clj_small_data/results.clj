@@ -13,6 +13,7 @@
 
 (defn view-one-result [result-map]
   {:fx/type :v-box
+   :fx/key (result-map ::model|id)
    :v-box/margin {:left 16
                   :right 16
                   :bottom 16}
@@ -94,10 +95,10 @@
         file-name-str (when path-str (last (str/split path-str #"[/\\]")))
         name-str (when file-name-str (str/replace file-name-str #"\.md$" ""))
         lines-map (some-> data-map :lines)
-        md-str (some-> lines-map :text str/trim)
-        #_{html-str (mdc/md-to-html-string md-str)}]
+        md-str (some-> lines-map :text str/trim)]
     (when (= type-str "match")
-      {::model|name name-str
+      {::model|id (hash (str name-str path-str md-str))
+       ::model|name name-str
        ::model|path path-wrapped-str
        ::model|link (path->uri kb-path-str path-str)
        ::model|line-number 123
