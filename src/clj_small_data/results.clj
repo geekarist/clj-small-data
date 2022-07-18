@@ -45,20 +45,24 @@
    :max-width Double/MAX_VALUE
    :text (format "Found %d results." (count results-coll))})
 
+(defn- desc-one-result [result-map]
+  {:fx/type view-one-result
+   :fx/key (result-map ::model|id)
+   :v-box/margin {:left 16 :right 16 :bottom 16}
+   ::view-prop|result result-map})
+
+(defn- desc-results-count [results-coll]
+  {:fx/type view-results-count
+   ::view-prop|results results-coll})
+
 (defn view-some-results [{results-coll ::view-prop|results}]
   {:fx/type :scroll-pane
    :fit-to-width true
    :content {:fx/type :v-box
              :padding {:top 16}
              :children
-             (concat [{:fx/type view-results-count
-                       ::view-prop|results results-coll}]
-                     (map (fn [result-map] {:fx/type view-one-result
-                                            :fx/key (result-map ::model|id)
-                                            :v-box/margin {:left 16
-                                                           :right 16
-                                                           :bottom 16}
-                                            ::view-prop|result result-map}) results-coll))}})
+             (concat [(desc-results-count results-coll)]
+                     (map desc-one-result results-coll))}})
 
 (defn view-empty-results [_arg]
   {:fx/type :label
