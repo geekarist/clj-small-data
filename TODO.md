@@ -29,7 +29,10 @@
   - [X] ~~*Same but in batches of N results?*~~ [2022-07-15]
 - [X] ~~*Optimize view components execution (~recomposition)*~~ [2022-07-15]
 - [X] ~~*Number of results on top*~~ [2022-07-15]
-- [ ] Paging results
+- [X] ~~*Paging results*~~ [2022-07-18]
+- [ ] Refactor view functions to descriptions
+- [ ] Refactor init functions/vars to events
+- [ ] Use ListView
 - [ ] Don't execute empty query
 - [ ] Prevent user interactions between during search
 - [ ] Let the user press Enter to submit a search

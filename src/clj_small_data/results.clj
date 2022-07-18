@@ -58,7 +58,7 @@
              (concat [(view-results-count results-coll)]
                      (map view-one-result results-coll))}})
 
-(defn view-empty-results []
+(defn view-empty-results [_arg]
   {:fx/type :label
    :style {:-fx-border-color ["#aaaaaa" "#00000000" "#00000000" "#00000000"]
            :-fx-border-width 0.5}
@@ -71,7 +71,7 @@
   (let [results-coll (fx/sub-val context ::model|results)]
     (if (not-empty results-coll)
       (view-some-results results-coll)
-      (view-empty-results))))
+      {:fx/type view-empty-results})))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
