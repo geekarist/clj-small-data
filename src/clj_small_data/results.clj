@@ -42,7 +42,7 @@
      :wrap-text true
      :text (result-map ::model|text)}]})
 
-(defn- view-results-count [results-coll]
+(defn- view-results-count [{results-coll ::view-prop|results}]
   {:fx/type :label
    :text-alignment :center
    :padding {:bottom 16 :left 16 :right 16}
@@ -55,7 +55,8 @@
    :content {:fx/type :v-box
              :padding {:top 16}
              :children
-             (concat [(view-results-count results-coll)]
+             (concat [{:fx/type view-results-count
+                       ::view-prop|results results-coll}]
                      (map view-one-result results-coll))}})
 
 (defn view-empty-results [_arg]
