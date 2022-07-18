@@ -49,7 +49,7 @@
    :max-width Double/MAX_VALUE
    :text (format "Found %d results." (count results-coll))})
 
-(defn view-some-results [results-coll]
+(defn view-some-results [{results-coll ::view-prop|results}]
   {:fx/type :scroll-pane
    :fit-to-width true
    :content {:fx/type :v-box
@@ -69,9 +69,10 @@
 (defn view [{context :fx/context}]
   (println "Executing results view")
   (let [results-coll (fx/sub-val context ::model|results)]
-    (if (not-empty results-coll)
-      (view-some-results results-coll)
-      {:fx/type view-empty-results})))
+    {:fx/type (if (not-empty results-coll)
+                view-some-results
+                view-empty-results)
+     ::view-prop|results results-coll}))
 
 (defn- path->uri [kb-path-str path-str]
   ;; kb-path-str: "c:\a\b\c-kb"
