@@ -11,12 +11,8 @@
 (defn init [on-receive-results]
   (assoc init-map ::model|on-receive-results on-receive-results))
 
-(defn view-one-result [result-map]
+(defn- view-one-result [{result-map ::view-prop|result}]
   {:fx/type :v-box
-   :fx/key (result-map ::model|id)
-   :v-box/margin {:left 16
-                  :right 16
-                  :bottom 16}
    :style {:-fx-border-color "#aaaaaa"
            :-fx-border-width 1}
    :children
@@ -57,7 +53,12 @@
              :children
              (concat [{:fx/type view-results-count
                        ::view-prop|results results-coll}]
-                     (map view-one-result results-coll))}})
+                     (map (fn [result-map] {:fx/type view-one-result
+                                            :fx/key (result-map ::model|id)
+                                            :v-box/margin {:left 16
+                                                           :right 16
+                                                           :bottom 16}
+                                            ::view-prop|result result-map}) results-coll))}})
 
 (defn view-empty-results [_arg]
   {:fx/type :label
