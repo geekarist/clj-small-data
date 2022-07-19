@@ -5,25 +5,6 @@
             [clj-small-data.runtime :as runtime]
             [cljfx.api :as fx]))
 
-(defn init-main [kb-path-str]
-  {::model|title "Small Data Finder"
-   ::model|iconified false
-   ::model|kb-path kb-path-str
-   ::model|status "Idle"})
-
-(def init
-  (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
-        on-result-received {::runtime/event-type ::event-type|on-results-received}
-        on-reinit-request {::runtime/event-type ::event-type|on-reinit-request}
-        on-send-query {::runtime/event-type ::event-type|on-status-changed
-                       ::event-arg|new-status "Searching..."}
-        on-receive-results {::runtime/event-type ::event-type|on-status-changed
-                            ::event-arg|new-status "Idle"}
-        main-init-map (init-main kb-path-str)
-        query-init-map (query/init kb-path-str on-result-received on-reinit-request on-send-query)
-        results-init-map (results/init on-receive-results)]
-    (conj main-init-map query-init-map results-init-map)))
-
 (defn view [{context :fx/context}]
   (println "Executing main view")
   {:fx/type :stage ; Window
@@ -63,13 +44,37 @@
       {:fx/type results/view
        :v-box/vgrow :always})}}})
 
+(defmethod runtime/upset ::event-type|init
+  [{context :fx/context}]
+
+  (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
+        on-result-received {::runtime/event-type ::event-type|on-results-received}
+        on-reinit-request {::runtime/event-type ::event-type|on-reinit-request}
+        on-send-query {::runtime/event-type ::event-type|on-status-changed
+                       ::event-arg|new-status "Searching..."}
+        on-receive-results {::runtime/event-type ::event-type|on-status-changed
+                            ::event-arg|new-status "Idle"}]
+
+    {:context (fx/reset-context ; Create a new context as this is the main module
+               context
+               {::model|title "Small Data Finder"
+                ::model|iconified false
+                ::model|kb-path kb-path-str
+                ::model|status "Idle"})
+
+     ::runtime/effect|dispatches
+     [{::runtime/event-type ::query/event-type|init
+       ::query/event-args [kb-path-str on-result-received on-reinit-request on-send-query]}
+      {::runtime/event-type ::results/event-type|init
+       ::results/event-args [on-receive-results]}]}))
+
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{context :fx/context}]
   {:context context})
 
 (defmethod runtime/upset ::event-type|on-reinit-request
-  [{context :fx/context}]
-  {:context (fx/reset-context context init)})
+  [{_context :fx/context}]
+  {:dispatch {::runtime/event-type ::event-type|init}})
 
 (defmethod runtime/upset ::event-type|on-results-received
   [{context :fx/context

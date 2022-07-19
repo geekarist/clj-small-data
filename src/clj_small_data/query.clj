@@ -2,18 +2,6 @@
   (:require [clj-small-data.runtime :as runtime]
             [cljfx.api :as fx]))
 
-(def init-map
-  {::model|search-text ""
-   ::model|search-field-placeholder "Please enter your search text"})
-
-(defn init
-  [kb-path-str on-search-output-received on-reinit-request on-send-query]
-  (conj init-map
-        {::model|kb-path kb-path-str
-         ::model|on-send-query on-send-query
-         ::model|on-reinit-request on-reinit-request
-         ::model|on-search-output on-search-output-received}))
-
 (defn view [{context :fx/context}]
   (println "Executing query view")
   {:fx/type :h-box
@@ -25,6 +13,18 @@
                :on-action {::runtime/event-type ::event-type|clear-btn-pressed}}
               {:fx/type :button :text "Find" :h-box/margin {:left 4}
                :on-action {::runtime/event-type ::event-type|search-btn-pressed}}]})
+
+(defmethod runtime/upset ::event-type|init
+  [{context :fx/context
+    [kb-path-str on-search-output-received on-reinit-request on-send-query] ::event-args}]
+  {:context
+   (fx/swap-context context assoc
+                    ::model|search-text ""
+                    ::model|search-field-placeholder "Please enter your search text"
+                    ::model|kb-path kb-path-str
+                    ::model|on-send-query on-send-query
+                    ::model|on-reinit-request on-reinit-request
+                    ::model|on-search-output on-search-output-received)})
 
 (defmethod runtime/upset ::event-type|change-search-query
   [{search-str :fx/event

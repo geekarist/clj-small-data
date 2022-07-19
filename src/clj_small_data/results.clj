@@ -5,12 +5,6 @@
             [clojure.string :as str])
   (:import (java.io File)))
 
-(def init-map
-  {::model|results []})
-
-(defn init [on-receive-results]
-  (assoc init-map ::model|on-receive-results on-receive-results))
-
 (defn- view-one-result [{result-map ::view-prop|result}]
   {:fx/type :v-box
    :style {:-fx-border-color "#aaaaaa"
@@ -110,6 +104,13 @@
        ::model|link (path->uri kb-path-str path-str)
        ::model|line-number 123
        ::model|text md-str})))
+
+(defmethod runtime/upset ::event-type|init
+  [{context :fx/context
+    [on-receive-results] ::event-args}]
+  {:context (fx/swap-context context assoc
+                             ::model|on-receive-results on-receive-results
+                             ::model|results [])})
 
 (defmethod runtime/upset ::event-type|search-output-received
   [{cmd-out-str ::runtime/effect|sh|cmd-out

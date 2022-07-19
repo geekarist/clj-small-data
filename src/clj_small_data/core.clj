@@ -3,7 +3,7 @@
             [clj-small-data.main :as main]))
 
 (def app
-  (runtime/create! main/init
+  (runtime/create! {::runtime/event-type ::main/event-type|init}
                    (fn [] main/view) ; Make it possible to reload the fn
                    runtime/upset))
 
