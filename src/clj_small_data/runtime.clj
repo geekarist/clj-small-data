@@ -1,8 +1,14 @@
 (ns clj-small-data.runtime
-  (:require [cljfx.api :as fx]
-            [clojure.java.shell :as shell]
-            [clj-uri.core :as curi]
-            [clojure.core.cache :as cache]))
+  (:require [clj-uri.core :as curi]
+            [cljfx.api :as fx :refer [create-renderer
+                                      fn->lifecycle-with-context keyword->lifecycle mount-renderer
+                                      wrap-map-desc]]
+            [cljfx.defaults :as defaults]
+            [cljfx.event-handler :as event-handler]
+            [cljfx.lifecycle :refer [wrap-context-desc]]
+            [cljfx.renderer :as renderer]
+            [clojure.core.cache :as cache]
+            [clojure.java.shell :as shell]))
 
 (defn- log! [arg _dispatch!]
   (println arg))
@@ -35,18 +41,52 @@
 
 (defmulti upset ::event-type)
 
+(defn create-app-without-mount
+  "Create an app exactly like cljfx.api/create-app, but don't mount the renderer"
+  [*context & {:keys [event-handler
+                      desc-fn
+                      co-effects
+                      effects
+                      async-agent-options
+                      renderer-middleware
+                      renderer-error-handler]
+               :or {co-effects {}
+                    effects {}
+                    async-agent-options {}
+                    renderer-middleware identity
+                    renderer-error-handler renderer/default-error-handler}}]
+  (let [handler (-> event-handler
+                    (event-handler/wrap-co-effects
+                     (defaults/fill-co-effects co-effects *context))
+                    (event-handler/wrap-effects
+                     (defaults/fill-effects effects *context))
+                    (event-handler/wrap-async
+                     (defaults/fill-async-handler-options async-agent-options)))
+        renderer (create-renderer
+                  :error-handler renderer-error-handler
+                  :middleware (comp
+                               wrap-context-desc
+                               (wrap-map-desc desc-fn)
+                               renderer-middleware)
+                  :opts {:fx.opt/map-event-handler handler
+                         :fx.opt/type->lifecycle #(or (keyword->lifecycle %)
+                                                      (fn->lifecycle-with-context %))})]
+    {:renderer renderer
+     :handler handler}))
+
 (defn create! [init-event-map get-view-fn upset]
   (let [cache-factory cache/lru-cache-factory
-        context (fx/create-context init-event-map cache-factory)
+        context (fx/create-context {} cache-factory)
         context-atom (atom context)
-        app (fx/create-app context-atom
-                           :event-handler upset
-                           :co-effects (coeffects context-atom)
-                           :effects (effects context-atom)
-                           :desc-fn (fn [_]
-                                      {:fx/type (get-view-fn)}))
-        handler (app :handler)]
-    (handler init-event-map)
+        app (create-app-without-mount context-atom
+                                      :event-handler upset
+                                      :co-effects (coeffects context-atom)
+                                      :effects (effects context-atom)
+                                      :desc-fn (fn [_]
+                                                 {:fx/type (get-view-fn)}))
+        {handler :handler renderer :renderer} app
+        _ (handler init-event-map)
+        _ (mount-renderer context-atom renderer)]
     app))
 
 (defn apply-changes! [app]

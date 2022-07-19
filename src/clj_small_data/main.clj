@@ -47,13 +47,7 @@
 (defmethod runtime/upset ::event-type|init
   [{context :fx/context}]
 
-  (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"
-        on-result-received {::runtime/event-type ::event-type|on-results-received}
-        on-reinit-request {::runtime/event-type ::event-type|on-reinit-request}
-        on-send-query {::runtime/event-type ::event-type|on-status-changed
-                       ::event-arg|new-status "Searching..."}
-        on-receive-results {::runtime/event-type ::event-type|on-status-changed
-                            ::event-arg|new-status "Idle"}]
+  (let [kb-path-str "C:/Users/chris/Google Drive/DriveSyncFiles/PERSO-KB"]
 
     {:context (fx/reset-context ; Create a new context as this is the main module
                context
@@ -62,9 +56,25 @@
                 ::model|kb-path kb-path-str
                 ::model|status "Idle"})
 
-     ::runtime/effect|dispatches
+     ::runtime/effect|dispatch
+     {::runtime/event-type ::event-type|init-others}}))
+
+(defmethod runtime/upset ::event-type|init-others
+  [{context :fx/context}]
+
+  (let [kb-path-str (fx/sub-val context ::model|kb-path)
+        on-result-received {::runtime/event-type ::event-type|on-results-received}
+        on-reinit-request {::runtime/event-type ::event-type|on-reinit-request}
+        on-send-query {::runtime/event-type ::event-type|on-status-changed
+                       ::event-arg|new-status "Searching..."}
+        on-receive-results {::runtime/event-type ::event-type|on-status-changed
+                            ::event-arg|new-status "Idle"}]
+
+    {::runtime/effect|dispatches
+
      [{::runtime/event-type ::query/event-type|init
        ::query/event-args [kb-path-str on-result-received on-reinit-request on-send-query]}
+
       {::runtime/event-type ::results/event-type|init
        ::results/event-args [on-receive-results]}]}))
 
@@ -80,13 +90,14 @@
   [{context :fx/context
     cmd-out-str ::runtime/effect|sh|cmd-out}]
 
-  {::runtime/effect|dispatch
-   {::runtime/event-type ::event-type|on-status-changed
-    ::event-arg|new-status "Presenting..."
+  {::runtime/effect|dispatches
 
-    ::then-dispatch {::runtime/event-type ::results/event-type|search-output-received
-                     ::runtime/effect|sh|cmd-out cmd-out-str
-                     ::results/event-arg|kb-path (fx/sub-val context ::model|kb-path)}}})
+   [{::runtime/event-type ::event-type|on-status-changed
+     ::event-arg|new-status "Presenting..."}
+
+    {::runtime/event-type ::results/event-type|search-output-received
+     ::runtime/effect|sh|cmd-out cmd-out-str
+     ::results/event-arg|kb-path (fx/sub-val context ::model|kb-path)}]})
 
 (defmethod runtime/upset ::event-type|log-btn-pressed
   [{context :fx/context}]

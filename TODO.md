@@ -30,8 +30,8 @@
 - [X] ~~*Optimize view components execution (~recomposition)*~~ [2022-07-15]
 - [X] ~~*Number of results on top*~~ [2022-07-15]
 - [X] ~~*Paging results*~~ [2022-07-18]
-- [ ] Refactor view functions to descriptions
-- [ ] Refactor init functions/vars to events
+- [X] ~~*Refactor view functions to descriptions*~~ [2022-07-19]
+- [X] ~~*Refactor init functions/vars to events*~~ [2022-07-19]
 - [ ] Use ListView
 - [ ] Don't execute empty query
 - [ ] Prevent user interactions between during search
