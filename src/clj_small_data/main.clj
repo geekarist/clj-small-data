@@ -68,15 +68,17 @@
         on-send-query {::runtime/event-type ::event-type|on-status-changed
                        ::event-arg|new-status "Searching..."}
         on-receive-results {::runtime/event-type ::event-type|on-status-changed
-                            ::event-arg|new-status "Idle"}]
+                            ::event-arg|new-status "Idle"}
+        next-event-map {::runtime/event-type ::results/event-type|init
+                        ::results/event-args [on-receive-results]}]
 
-    {::runtime/effect|dispatches
-
-     [{::runtime/event-type ::query/event-type|init
-       ::query/event-args [kb-path-str on-result-received on-reinit-request on-send-query]}
-
-      {::runtime/event-type ::results/event-type|init
-       ::results/event-args [on-receive-results]}]}))
+    {:dispatch
+     {::runtime/event-type ::query/event-type|init
+      ::query/event-args [kb-path-str
+                          on-result-received
+                          on-reinit-request
+                          on-send-query
+                          next-event-map]}}))
 
 (defmethod runtime/upset ::event-type|redraw-btn-pressed
   [{context :fx/context}]

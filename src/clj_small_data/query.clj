@@ -16,7 +16,8 @@
 
 (defmethod runtime/upset ::event-type|init
   [{context :fx/context
-    [kb-path-str on-search-output-received on-reinit-request on-send-query] ::event-args}]
+    [kb-path-str on-search-output-received on-reinit-request on-send-query next-event-map]
+    ::event-args}]
   {:context
    (fx/swap-context context assoc
                     ::model|search-text ""
@@ -24,7 +25,9 @@
                     ::model|kb-path kb-path-str
                     ::model|on-send-query on-send-query
                     ::model|on-reinit-request on-reinit-request
-                    ::model|on-search-output on-search-output-received)})
+                    ::model|on-search-output on-search-output-received)
+
+   :dispatch next-event-map})
 
 (defmethod runtime/upset ::event-type|change-search-query
   [{search-str :fx/event

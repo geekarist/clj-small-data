@@ -23,7 +23,7 @@
 - [X] ~~*Fix WebView scrolling*~~ [2022-06-24]
 - [X] ~~*Improve margins and borders*~~ [2022-06-24]
 - [X] ~~*Status bar*~~ [2022-06-28]
-- [ ] Optimize result formatting
+- [X] ~~*Optimize result formatting*~~ [2022-07-20]
   - [X] ~~*Format each result in a separate event handler call?*~~ [2022-07-07]s
   - [X] ~~*Extract side effect?*~~ [2022-07-07]
   - [X] ~~*Same but in batches of N results?*~~ [2022-07-15]
@@ -33,8 +33,9 @@
 - [X] ~~*Refactor view functions to descriptions*~~ [2022-07-19]
 - [X] ~~*Refactor init functions/vars to events*~~ [2022-07-19]
 - [ ] Use ListView
+- [ ] Create model specs
 - [ ] Don't execute empty query
-- [ ] Prevent user interactions between during search
+- [ ] Prevent user interactions during search
 - [ ] Let the user press Enter to submit a search
 - [ ] 'Search in Obsidian' link on top of the results
 - [ ] 'Search in progress' indicator
