@@ -102,7 +102,6 @@
        ::model|name name-str
        ::model|path path-wrapped-str
        ::model|link (path->uri kb-path-str path-str)
-       ::model|line-number 123
        ::model|text md-str})))
 
 (defmethod runtime/upset ::event-type|init
