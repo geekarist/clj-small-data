@@ -15,7 +15,7 @@
   {:fx/type result/view
    :fx/key (result-map ::model|id)
    :v-box/margin {:left 16 :right 16 :bottom 16}
-   ::view-prop|result result-map})
+   ::result/view-prop|result result-map})
 
 (defn- desc-results-count [results-coll]
   {:fx/type view-results-count
@@ -59,13 +59,12 @@
 
   (let [split-output-strs-coll (str/split-lines cmd-out-str)
         match->result #(result/from-match kb-path-str %)
-        new-results-coll (->> split-output-strs-coll
-                              (map match->result)
-                              (filter some?))]
+        all-new-results-coll (map match->result split-output-strs-coll)
+        some-new-results-coll (filter some? all-new-results-coll)]
 
     {::runtime/effect|dispatch
      {::runtime/event-type ::event-type|results-received
-      ::event-arg|new-results new-results-coll}}))
+      ::event-arg|new-results some-new-results-coll}}))
 
 (defmethod runtime/upset ::event-type|results-received
   [{new-results-coll ::event-arg|new-results
