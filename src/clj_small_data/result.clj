@@ -1,7 +1,8 @@
 (ns clj-small-data.result
   (:require [clj-small-data.runtime :as runtime]
             [clojure.data.json :as json]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import (java.io File)))
 
 ; ----------------------------------- Model ---------------------------------- ;
 
@@ -56,7 +57,7 @@
         uri (format uri-pattern vault-str file-encoded-fixed-str)]
     uri))
 
-(defn- match-json-map->result-map [kb-path-str json-deserialized]
+(defn- match-json->result [kb-path-str json-deserialized]
   (let [type-str (some-> json-deserialized :type)
         data-map (some-> json-deserialized :data)
         path-map (some-> data-map :path)
@@ -73,15 +74,13 @@
        ::model|link (path->uri kb-path-str path-str)
        ::model|text md-str})))
 
-(defn- match->result [kb-path-str match-json-str]
+(defn from-match [kb-path-str item-json-str]
 
-  (let [match-json-map (json/read-str match-json-str :key-fn keyword)
-        result-map (match-json-map->result-map kb-path-str match-json-map)]
+  (let [item-json-map (json/read-str item-json-str :key-fn keyword)
+        result-map (match-json->result kb-path-str item-json-map)]
 
     result-map))
 
-(defmethod runtime/upset ::event-type|match-received
-  [{[kb-path-str match-json-str on-new-result] ::runtime/event-args}]
-
-  (let [new-result-map (match->result kb-path-str match-json-str)]
-    {:dispatch (assoc on-new-result ::runtime/event-arg new-result-map)}))
+(defmethod runtime/upset ::event-type|link-clicked
+  [{:keys [::event-arg]}]
+  {::runtime/effect|open-uri event-arg})
