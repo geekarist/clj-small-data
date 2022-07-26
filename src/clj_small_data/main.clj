@@ -1,7 +1,7 @@
 (ns clj-small-data.main
   (:refer-clojure :exclude [update])
   (:require [clj-small-data.query :as query]
-            [clj-small-data.results :as results]
+            [clj-small-data.findingss :as results]
             [clj-small-data.runtime :as runtime]
             [cljfx.api :as fx]))
 

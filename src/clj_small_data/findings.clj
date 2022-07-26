@@ -1,4 +1,4 @@
-(ns clj-small-data.results
+(ns clj-small-data.findings
   (:require [clj-small-data.result :as result]
             [clj-small-data.runtime :as runtime]
             [cljfx.api :as fx]
