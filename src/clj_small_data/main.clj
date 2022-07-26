@@ -1,7 +1,7 @@
 (ns clj-small-data.main
   (:refer-clojure :exclude [update])
   (:require [clj-small-data.query :as query]
-            [clj-small-data.findingss :as results]
+            [clj-small-data.findings :as findings]
             [clj-small-data.runtime :as runtime]
             [cljfx.api :as fx]))
 
@@ -41,7 +41,7 @@
          :pref-width 70 :max-width 70})}
 
       ;; List of results
-      {:fx/type results/view
+      {:fx/type findings/view
        :v-box/vgrow :always})}}})
 
 (defmethod runtime/upset ::event-type|init
@@ -69,8 +69,8 @@
                        ::event-arg|new-status "Searching..."}
         on-receive-results {::runtime/event-type ::event-type|on-status-changed
                             ::event-arg|new-status "Idle"}
-        next-event-map {::runtime/event-type ::results/event-type|init
-                        ::results/event-args [on-receive-results]}]
+        next-event-map {::runtime/event-type ::findings/event-type|init
+                        ::findings/event-args [on-receive-results]}]
 
     {:dispatch
      {::runtime/event-type ::query/event-type|init
@@ -97,9 +97,9 @@
    [{::runtime/event-type ::event-type|on-status-changed
      ::event-arg|new-status "Presenting..."}
 
-    {::runtime/event-type ::results/event-type|search-output-received
+    {::runtime/event-type ::findings/event-type|search-output-received
      ::runtime/effect|sh|cmd-out cmd-out-str
-     ::results/event-arg|kb-path (fx/sub-val context ::model|kb-path)}]})
+     ::findings/event-arg|kb-path (fx/sub-val context ::model|kb-path)}]})
 
 (defmethod runtime/upset ::event-type|log-btn-pressed
   [{context :fx/context}]
