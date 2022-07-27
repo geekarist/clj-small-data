@@ -13,7 +13,7 @@
 
 (defn- desc-one-result [result-map]
   {:fx/type result/view
-   :fx/key (result-map ::model|id)
+   :fx/key (result/get-key result-map)
    :v-box/margin {:left 16 :right 16 :bottom 16}
    ::result/view-prop|result result-map})
 

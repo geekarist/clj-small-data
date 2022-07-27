@@ -68,7 +68,7 @@
         lines-map (some-> data-map :lines)
         md-str (some-> lines-map :text str/trim)]
     (when (= type-str "match")
-      {::model|id (hash (str name-str path-str md-str))
+      {::model|id (hash json-deserialized)
        ::model|name name-str
        ::model|path path-wrapped-str
        ::model|link (path->uri kb-path-str path-str)
@@ -80,6 +80,9 @@
         result-map (match-json->result kb-path-str item-json-map)]
 
     result-map))
+
+(defn get-key [result-map]
+  (result-map ::model|id))
 
 (defmethod runtime/upset ::event-type|link-clicked
   [{:keys [::event-arg]}]
